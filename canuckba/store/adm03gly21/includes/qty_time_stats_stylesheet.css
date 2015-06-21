@@ -1,0 +1,57 @@
+/* CSS Document */
+.quantity {
+  background-color: #BFFF9F;
+   border-right: 1px solid #000000;
+   border-bottom: 1px solid #000000;
+  }
+
+.price {
+ background-color: #9FFFEB;
+ border-right: 1px solid #000000;
+ border-bottom: 1px solid #000000;
+}
+
+.tax {
+ background-color: #FF9FA3;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+
+table.display_table {
+  border-left: 1px solid #000000;
+  border-top: 1px solid #000000;
+}
+
+.dataTableHeadingContent2 {
+  color:#333333;
+  font-weight:bold;
+  border-right: 1px solid #000000;
+}
+
+table.results {
+  /*border-top: 1px solid #000000;*/
+  /*border-left: 1px solid #000000;*/
+  /*border-right: 1px solid #000000;*/
+}
+
+td.display_right {
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+
+.dataTableHeadingContent3 {
+  color:#333333;
+  font-weight:bold;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+
+.dataTableHeadingContent4 {
+  color:#333333;
+  font-weight:bold;
+  border-bottom: 1px solid #000000;
+}
+
+.bottom {
+  /*border-bottom: 1px solid #000000;*/
+}

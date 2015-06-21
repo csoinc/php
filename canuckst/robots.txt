@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: /img/
+Disallow: /myfiles/
+Disallow: /cgi-bin/
+Disallow: /backup/
+Disallow: /store/adm03gly21
+Disallow: /store/cache/
+Disallow: /store/download/
+Disallow: /store/editor/
+Disallow: /store/docs/
+Disallow: /store/email/
+Disallow: /store/media/
+Disallow: /store/pub/
+Disallow: /store/oexport/
+Disallow: /store/xml/
+
+Crawl-delay: 5
+
+Sitemap: http://www.canuckstuff.com/sitemap1.xml

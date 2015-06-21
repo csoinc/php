@@ -1,0 +1,263 @@
+<?php
+class Uniformclients extends CI_Controller {
+
+  private $title;
+  private $trip;
+
+  public function __construct()
+  {
+    parent::__construct();
+    $this->load->library('template');
+    $this->load->library('session');
+    $this->load->library('pagination');
+    $this->load->library('table');
+    $this->load->library('form_validation');
+    $this->load->helper(array('form', 'url'));
+    $this->load->language('properties');
+
+    $this->load->model('clients');
+    $this->load->model('codes');
+
+    $this->title = "Clients";
+    $this->trip = '<img src="'.WEB_CONTEXT.'/images/icons/icon_arrow_right.gif" />&nbsp;Clients';
+
+  }
+
+  public function index($message = 'List') {
+    redirect('/uniformclients/select/0/0/'.$message, 'refresh');
+  }
+
+  public function search($clients_start = 0, $message = '')
+  {
+    $this->form_validation->set_error_delimiters('<div class="messageStackError">', '</div>');
+    $this->form_validation->set_rules('clients_what', 'What', 'trim|xss_clean');
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+      if ($this->codes->role_order_read($uf_orders) || $this->codes->role_order_update($uf_orders)) {
+        if ($this->form_validation->run() == TRUE) {
+          $clients_what = $this->input->get_post('clients_what',TRUE);
+          $this->session->set_userdata('clients_what', $clients_what);
+          $this->select(0,0,INFO_SUCCESS);
+        } else {
+          $this->select(0,0,ERROR_FORM_VALIDATION);
+        }
+      } else {
+        $this->select(0,0,INFO_UNAUTHORISED);
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+
+  }
+
+  public function select($clients_start = 0, $clients_edit = 0, $messsage = '')
+  {
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_read($uf_orders) || $this->codes->role_order_update($uf_orders)) {
+
+        $clients_what = $this->session->userdata('clients_what');
+
+        $data['clients_what'] = $clients_what;
+        $data['clients_start'] = $clients_start;
+        $data['clients_edit'] = $clients_edit;
+
+        $this->template->write_view('header', 'common/admin_header');
+        $this->template->write('message', $messsage);
+        $this->template->write('title', $this->title);
+        $this->template->write('trip', $this->trip);
+        
+        if ($data['rows'] = $this->clients->search($clients_what)) {
+
+          $config['base_url'] = base_url().'/uniformclients/select/';
+          $config['total_rows'] = $data['rows']->num_rows();
+          $config['per_page'] = '10';
+          $config['full_tag_open'] = '<p>';
+          $config['full_tag_close'] = '</p>';
+          $this->pagination->initialize($config);
+
+          $table_settings=array(
+                'table_open' => '<table class="zebraTable" width="1000">',
+                'heading_row_start' => '<tr class="rowEven">',
+                'row_start' => '<tr class="rowOdd">',
+                'row_alt_start' => '<tr class="rowEven">'
+          );
+          $this->table->set_template($table_settings); //apply the settings
+
+          $this->table->set_heading('Client #', 'Contact Info', 'Address', 'Actions');
+
+          $clients_end = $clients_start + 10;
+          $r = 0;
+
+          foreach($data['rows']->result() as $row)
+          {
+            if ($r >= $clients_start && $r < $clients_end) {
+              $edit_col = sprintf('<a href="%s/uniformclients/select/%d/%d" title="Client - Edit"><img src="%s/images/icons/icon_edit_pen.gif" height="20px" /></a>', WEB_CONTEXT, $clients_start, (string)$row->clientid, WEB_CONTEXT);
+              $order_col = sprintf('<a href="%s/clientorders/form_confirm_client/%d/%d" title="Client Order - New"><img src="%s/images/icons/icon_order.jpg" height="20px" /></a>', WEB_CONTEXT, $clients_start, (string)$row->clientid, WEB_CONTEXT);
+              $orders_col = sprintf('<a href="%s/clientorders/select/%d/%d" title="Client Orders - List"><img src="%s/images/icons/icon_order_db.png" height="20px" /></a>', WEB_CONTEXT, $clients_start, (string)$row->clientid, WEB_CONTEXT);
+              if ($clients_edit == $row->clientid) {
+                $update_col = sprintf('<img src="%s/images/icons/icon_save.gif" /><input type="submit" value="Update" title="Update this client"/>', WEB_CONTEXT);
+                $name_col = sprintf('<input type="text" name="name" id="name" value="%s" maxlength="100" size="40"/>(name)', (string)$row->name);
+                $team_col = sprintf('<input type="text" name="team" id="team" value="%s" maxlength="100" size="40" />(team)', (string)$row->team);
+                $contact_col = sprintf('<input type="text" name="contact" id="contact" value="%s" maxlength="50" size="15" />(contact)', (string)$row->contact);
+                $email_col = sprintf('<input type="text" name="email" id="email" value="%s" maxlength="100" size="15" />(email)', (string)$row->email);
+                $telephone_col = sprintf('<input type="text" name="telephone" id="telephone" value="%s" maxlength="20" size="15" />(phone)', (string)$row->telephone);
+                $cellphone_col = sprintf('<input type="text" name="cellphone" id="cellphone" value="%s" maxlength="20" size="15" />(cell)', (string)$row->cellphone);
+                $fax_col = sprintf('<input type="text" name="fax" id="update_fax" value="%s" maxlength="15" size="15" />(fax)', (string)$row->fax);
+                $street_col = sprintf('<input type="text" name="street" id="street" value="%s" maxlength="100" size="40" />(street)', (string)$row->street);
+                $city_col = sprintf('<input type="text" name="city" id="city" value="%s" maxlength="45" size="15" />(city)', (string)$row->city);
+                $province_col = sprintf('<input type="text" name="province" id="province" value="%s" maxlength="45" size="10" />(province)', (string)$row->province);
+                $zipcode_col = sprintf('<input type="text" name="zipcode" id="zipcode" value="%s" maxlength="45" size="10" />(zipcode)', (string)$row->zipcode);
+
+                $this->table->add_row($update_col,$name_col.'<br>'.$team_col.'<br>'.$contact_col.'<br>'.$email_col.' '.$fax_col.'<br>'.$telephone_col.'<br>'.$cellphone_col,
+                $street_col.'<br>'.$city_col.'<br>'.$province_col.' '.$zipcode_col,$edit_col.'&nbsp;&nbsp;'.$order_col.'&nbsp;&nbsp;'.$orders_col);
+              } else {
+                $this->table->add_row($row->clientid,$row->name.'<br>'.$row->team.'<br>'.$row->contact.'<br>'.$row->email.' fax:'.$row->fax.'<br>phone:'.$row->telephone.'  cell:'.$row->cellphone,
+                $row->street.'<br>'.$row->city.'<br>'.$row->province.' '.$row->zipcode,$edit_col.'&nbsp;&nbsp;'.$order_col.'&nbsp;&nbsp;'.$orders_col);
+              }
+            }
+            $r++;
+          }
+          $data['clients_table'] = $this->table->generate();
+        } 
+        $this->template->write_view('content', 'clients', $data);
+        // Write to $content
+        $this->template->write_view('footer', 'common/footer');
+        // Render the template
+        $this->template->render();
+      } else {
+        redirect('/uniformorders/select/'.$clients_start.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function update($clients_start = 0, $clients_edit = 0, $messsage = '')
+  {
+    $this->form_validation->set_error_delimiters('<div class="messageStackError">', '</div>');
+    $this->form_validation->set_rules('contact', 'Contact', 'trim|required|min_length[3]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('name', 'School', 'trim|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('team', 'Team', 'trim|max_length[100]|xss_clean');
+    //$this->form_validation->set_rules('email', 'Email', 'trim|valid_email|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('telephone', 'Telephone', 'trim|required|min_length[10]|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('cellphone', 'Cellphone', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('fax', 'Fax', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('street', 'Street', 'trim|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('city', 'City', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('province', 'Province', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('zipcode', 'Zipcode', 'trim|max_length[45]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_uniforms)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          $contact = $this->input->get_post('contact',TRUE);
+          $name = $this->input->get_post('name',TRUE);
+          $team = $this->input->get_post('team',TRUE);
+          $email = $this->input->get_post('email',TRUE);
+          $telephone = $this->input->get_post('telephone',TRUE);
+          $cellphone = $this->input->get_post('cellphone',TRUE);
+          $fax = $this->input->get_post('fax',TRUE);
+          $street = $this->input->get_post('street',TRUE);
+          $city = $this->input->get_post('city',TRUE);
+          $province = $this->input->get_post('province',TRUE);
+          $zipcode = $this->input->get_post('zipcode',TRUE);
+
+          if ($this->clients->update_client($clients_edit,$name,$team,$contact,$email,$telephone,$cellphone,$fax,$street,$city,$province,$zipcode)) {
+            $this->select($clients_start,$clients_edit,INFO_SUCCESS);
+          } else {
+            $this->select($clients_start,$clients_edit,INFO_UNCHANGED);
+          }
+        } else {
+          $this->select($clients_start,$clients_edit,ERROR_FORM_VALIDATION);
+        }
+      } else {
+        $this->select($clients_start,$clients_edit,INFO_UNAUTHORISED);
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+
+  }
+
+  public function insert($clients_start = 0, $clients_edit = 0, $messsage = '')
+  {
+    $this->form_validation->set_error_delimiters('<div class="messageStackError">', '</div>');
+    $this->form_validation->set_rules('contact', 'Contact', 'trim|required|min_length[3]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('name', 'School', 'trim|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('team', 'Team', 'trim|max_length[100]|xss_clean');
+    //$this->form_validation->set_rules('email', 'Email', 'trim|valid_email|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('telephone', 'Telephone', 'trim|required|min_length[10]|max_length[45]|callback_phone_check|xss_clean');
+    $this->form_validation->set_rules('cellphone', 'Cellphone', 'trim|xss_clean');
+    $this->form_validation->set_rules('fax', 'Fax', 'trim|min_length[10]|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('street', 'Street', 'trim|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('city', 'City', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('province', 'Province', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('zipcode', 'Zipcode', 'trim|max_length[45]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          $contact = $this->input->get_post('contact',TRUE);
+          $name = $this->input->get_post('name',TRUE);
+          $team = $this->input->get_post('team',TRUE);
+          $email = $this->input->get_post('email',TRUE);
+          $telephone = $this->input->get_post('telephone',TRUE);
+          $cellphone = $this->input->get_post('cellphone',TRUE);
+          $fax = $this->input->get_post('fax',TRUE);
+          $street = $this->input->get_post('street',TRUE);
+          $city = $this->input->get_post('city',TRUE);
+          $province = $this->input->get_post('province',TRUE);
+          $zipcode = $this->input->get_post('zipcode',TRUE);
+
+          if ($this->clients->insert($name,$team,$contact,$email,$telephone,$cellphone,$fax,$street,$city,$province,$zipcode)) {
+            $this->select($clients_start,$clients_edit,INFO_SUCCESS);
+          } else {
+            $this->select($clients_start,$clients_edit,INFO_UNCHANGED);
+          }
+        } else {
+          $this->select($clients_start,$clients_edit,ERROR_FORM_VALIDATION);
+        }
+      } else {
+        $this->select($clients_start,$clients_edit,INFO_UNAUTHORISED);
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+
+  }
+
+  public function phone_check($phone)
+  {
+    if (preg_match("/[0-9]{3}[-]{1}[0-9]{3}[-]{1}[0-9]{4}/", $phone)) {
+      return TRUE;
+    }
+    else
+    {
+      $this->form_validation->set_message('phone_check', 'The %s field must be ###-###-#### format');
+      return FALSE;
+    }
+  }
+  
+  public function comments()
+  {
+    echo 'Clients - maintenance.';
+  }
+
+}
+?>

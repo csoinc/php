@@ -1,0 +1,9 @@
+# Forbid access to PHP scripts in this directory
+<FilesMatch "\.(php)$">
+	Deny from all
+</FilesMatch>
+
+# Prevent execution of CGI scripts and any PHP scripts that slip through the FilesMatch (will be returned as text)
+# Options -ExecCGI
+# php_flag engine off
+

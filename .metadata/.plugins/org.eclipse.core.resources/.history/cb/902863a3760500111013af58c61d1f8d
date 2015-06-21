@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /store/admin/
+Disallow: /store/admin/admin.php
+
+
+Crawl-delay: 30
+
+Sitemap: http://www.canuckbadminton.com/SitemapIndex.xml

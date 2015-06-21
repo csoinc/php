@@ -1,0 +1,6 @@
+what,kind,bundleId,bundleVersion,description,time
+started,bundle,org.polarion.eclipse.team.svn.connector.javahl16,2.2.2.I20110819-1700,"org.polarion.eclipse.team.svn.connector.javahl16",1331567575937
+opened,view,org.eclipse.ui.ide,3.7.0.v20110809-1737,"org.eclipse.ui.views.ProblemView",1331567578391
+started,bundle,org.polarion.eclipse.team.svn.connector.svnkit15,2.2.2.I20110819-1700,"org.polarion.eclipse.team.svn.connector.svnkit15",1331567578563
+started,bundle,org.polarion.eclipse.team.svn.connector.svnkit16,2.2.2.I20110819-1700,"org.polarion.eclipse.team.svn.connector.svnkit16",1331567579376
+started,bundle,org.polarion.eclipse.team.svn.connector.svnkit16l,2.2.2.I20110819-1700,"org.polarion.eclipse.team.svn.connector.svnkit16l",1331567580142

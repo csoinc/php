@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename source module &apos;store/includes/languages/english/extra_definitions.design.php&apos; to &apos;design_v1.0.php&apos;&#x0D;&#x0A;- Original element: &apos;store/includes/languages/english/extra_definitions\design.php&apos;&#x0D;&#x0A;- Renamed element: &apos;store/includes/languages/english/extra_definitions\design_v1.0.php&apos;" description="Rename source module &apos;design.php&apos;" flags="589830" id="org.eclipse.dltk.ui.rename.sourcemodule" input="/&lt;store\/includes\/languages\/english\/extra_definitions{design.php" name="design_v1.0.php" stamp="1334075117093" version="1.0"/>
+</session>

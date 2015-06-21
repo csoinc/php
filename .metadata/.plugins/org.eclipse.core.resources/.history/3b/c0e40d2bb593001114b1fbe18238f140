@@ -1,0 +1,221 @@
+<?php
+class Uniformorderitems extends CI_Controller {
+  private $title;
+  private $trip;
+
+  public function __construct()
+  {
+    parent::__construct();
+    $this->load->library('template');
+    $this->load->library('session');
+    $this->load->library('pagination');
+    $this->load->library('table');
+    $this->load->library('form_validation');
+    $this->load->helper(array('form', 'url'));
+    $this->load->language('properties');
+
+    $this->load->model('orders');
+    $this->load->model('styles');
+    $this->load->model('stocks');
+    $this->load->model('codes');
+    $this->load->model('artworks');
+
+    $this->title = "Order Details";
+
+    $this->trip = '<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Orders';
+    $this->trip = $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Items';
+
+  }
+
+  public function select($orders_start = 0, $orderid = 0, $message = '')
+  {
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_read($uf_orders) || $this->codes->role_order_update($uf_orders)) {
+        $data['orders_start'] = $orders_start;
+        $data['orderid'] = $orderid;
+
+        $order = $this->orders->select_order_by_id($orderid);
+        $data['order'] = $order;
+        $data['orderstatus_list'] = $this->codes->select_codes_by_codetype('OrderStatus');
+        $data['orderstatus_options'] = 'id="colours" size="1"';
+
+        $data['artworkstatus_list'] = $this->codes->select_codes_by_codetype('ArtworkStatus');
+        $data['artworkstatus_options'] = 'id="artworkstatus" size="1"';
+        $data['artworksource_list'] = $this->codes->select_codes_by_codetype('ArtworkSource');
+        $data['artworksource_options'] = 'id="artworksource" size="1"';
+
+        $data['order_artworks'] = $this->artworks->select_artworks_by_order($orderid);
+        
+        $this->template->write_view('header', 'common/admin_header');
+        $this->template->write('message', $message);
+        $this->template->write('title', $this->title.' : '.$order->contact.' ('.$order->name.')');
+        $this->template->write('trip', $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;'.$order->contact.' ('.$order->name.')');
+
+        if ($data['rows'] = $this->stocks->select_stocks_by_order($orderid)) {
+
+          $table_settings=array(
+                        'table_open' => '<table class="printTable">',
+                        'heading_row_start' => '<tr class="rowOdd">',
+                        'row_start' => '<tr class="rowEven">',
+                        'row_alt_start' => '<tr class="rowOdd">'
+          );
+          $this->table->set_template($table_settings); //apply the settings
+
+          $this->table->set_heading('Custom Order');
+
+          foreach($data['rows']->result() as $row)
+          {
+            $style = $this->styles->select_style_by_id($row->styleid);
+
+            $print_col = sprintf('<a href="javascript:onClick=printPage()" title="Order - Print"><img src="/images/icons/icon_print.gif" /></a>');
+
+            $item_table = '<table style="width:100%;border=1px">';
+            $item_table = $item_table.'<tr><th>'.$row->itemname.'</th></tr>';
+            $item_table = $item_table.'<tr><td>Item Code: '.$row->itemcode.'<br>';
+            $item_table = $item_table.'Style Colour: '.$style->colorname.'<br>';
+            $item_table = $item_table.'Comments: '.$row->description.'&nbsp;'.$row->comments.'</td></tr>';
+            $item_table = $item_table.'</table>';
+
+            $sizes_table = '<table style="width:100%;border=1px">';
+            $sizes_table = $sizes_table.'<tr><th>Size</th><th>Qty</th><th>Numbers</th></tr>';
+            $sizes_table = $sizes_table.'<tr><td>XS</td><td>'.abs($row->xsmall).'</td><td>'.$row->xsmallnumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>S</td><td>'.abs($row->small).'</td><td>'.$row->smallnumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>M</td><td>'.abs($row->medium).'</td><td>'.$row->mediumnumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>L</td><td>'.abs($row->large).'</td><td>'.$row->largenumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>XL</td><td>'.abs($row->xlarge).'</td><td>'.$row->xlargenumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>XXL</td><td>'.abs($row->xxlarge).'</td><td>'.$row->xxlargenumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td><b>Total&nbsp;</b></td><td>'.abs($row->subtotal).'</td><td></td></tr>';
+            $sizes_table = $sizes_table.'</table>';
+
+
+            $design_table = '<table style="width:100%;border=1px">';
+            $design_table = $design_table.'<tr><th></th><th>Team Name or Logo</th><th>Number</th></tr>';
+            $design_table = $design_table.'<tr><td>Front</td><td align="center">'.$row->frontlogoname.'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->frontlogopos,"FrontLogoPos").'<br>';
+            $design_table = $design_table.$row->frontlogocolor.'<br>';
+            $design_table = $design_table.$row->frontlogotrimcolor.'</td>';
+            $design_table = $design_table.'<td align="center">'.$this->codes->select_name_by_value($row->frontnumsize,"NumSize").'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->frontnumpos,"FrontNumPos").'<br>';
+            $design_table = $design_table.$row->frontnumcolor.'<br>';
+            $design_table = $design_table.$row->frontnumtrimcolor.'</td></tr>';
+
+            $design_table = $design_table.'<tr><td>Back</td><td align="center">'.$row->rearlogoname.'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->rearlogopos,"RearLogoPos").'<br>';
+            $design_table = $design_table.$row->rearlogocolor.'<br>';
+            $design_table = $design_table.$row->rearlogotrimcolor.'<br>';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->rearname,"RearLogPos").'</td>';
+            $design_table = $design_table.'<td align="center">'.$this->codes->select_name_by_value($row->rearnumsize,"NumSize").'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->rearnumpos,"RearNumPos").'<br>';
+            $design_table = $design_table.$row->rearnumcolor.'<br>';
+            $design_table = $design_table.$row->rearnumtrimcolor.'</td></tr>';
+
+            $design_table = $design_table.'<tr><td>Shorts</td><td align="center">'.$row->sidelogoname.'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->sidelogopos,"ShortLogoPos").'<br>';
+            $design_table = $design_table.$row->sidelogocolor.'<br>';
+            $design_table = $design_table.$row->sidelogotrimcolor.'</td>';
+            $design_table = $design_table.'<td align="center">'.$this->codes->select_name_by_value($row->sidenumsize,"NumSize").'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->sidenumpos,"ShortNumPos").'<br>';
+            $design_table = $design_table.$row->sidenumcolor.'<br>';
+            $design_table = $design_table.$row->sidenumtrimcolor.'</td></tr>';
+            $design_table = $design_table.'</table>';
+
+
+            $this->table->add_row($item_table.''.$design_table.''.$sizes_table.''.$print_col);
+          }
+
+          $data['order_items_table'] = $this->table->generate();
+        }
+
+        $this->template->write_view('content', 'order_items', $data);
+
+        // Write to $content
+        $this->template->write_view('footer', 'common/footer');
+        // Render the template
+        $this->template->render();
+      }
+      else {
+        redirect('/uniformorderitems/select/'.$orders_start.'/'.$orderid.'/Unauthorised', 'refresh');
+      }
+
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function update_status($orders_start = 0, $orderid = 0, $message = '')
+  {
+    $this->form_validation->set_rules('itemcode_upd', 'ItemCode', 'trim|required|min_length[3]|max_length[12]|xss_clean');
+    $this->form_validation->set_rules('itemname_upd', 'ItemName', 'trim|required|min_length[8]|max_length[50]|xss_clean');
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+      $items_what = $this->session->userdata('items_what');
+      //$items_start = $this->input->get_post('items_start',TRUE);
+      $itemid = $this->input->get_post('itemid_upd',TRUE);
+      $itemcode = $this->input->get_post('itemcode_upd',TRUE);
+      $itemname = $this->input->get_post('itemname_upd',TRUE);
+      if ($this->codes->role_uniform_update($uf_uniforms)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          if ($this->items->update($itemid, $itemcode, $itemname)) {
+            redirect('/uniforms/edit/'.$items_start.'/0/Successful', 'refresh');
+          } else {
+            redirect('/uniforms/edit/'.$items_start.'/0/Unchanged', 'refresh');
+          }
+        } else {
+          redirect('/uniforms/edit/'.$items_start.'/'.$itemid.'/Unchanged', 'refresh');
+        }
+      } else {
+        redirect('/uniforms/edit/'.$items_start.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+
+  }
+
+  public function insert($items_start = 0)
+  {
+    $this->form_validation->set_rules('itemcode', 'ItemCode', 'trim|required|min_length[3]|max_length[12]|xss_clean');
+    $this->form_validation->set_rules('itemname', 'ItemName', 'trim|required|min_length[8]|max_length[50]|xss_clean');
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      $items_start = $this->input->get_post('items_start',TRUE);
+      $itemid = $this->input->get_post('itemid',TRUE);
+      $itemcode = $this->input->get_post('itemcode',TRUE);
+      $itemname = $this->input->get_post('itemname',TRUE);
+      if ($this->codes->role_uniform_update($uf_uniforms)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          if ($this->items->insert($itemcode, $itemname)) {
+            redirect('/uniforms/edit/'.$items_start.'/0/Successful', 'refresh');
+          } else {
+            redirect('/uniforms/edit/'.$items_start.'/0/Unchanged', 'refresh');
+          }
+        } else {
+          redirect('/uniforms/edit/'.$items_start.'/'.$itemid.'/Unchanged', 'refresh');
+        }
+      } else {
+        redirect('/uniforms/edit/'.$items_start.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+
+  }
+
+  public function comments()
+  {
+    echo 'Order Details - maintenance.';
+  }
+
+}
+?>

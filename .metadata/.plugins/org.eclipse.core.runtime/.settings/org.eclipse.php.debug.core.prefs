@@ -1,0 +1,8 @@
+DefaultProjectBasePath=/overkill
+eclipse.preferences.version=1
+org.eclipse.php.debug.coreinstalledPHPDebuggers=org.eclipse.php.debug.core.zendDebugger
+org.eclipse.php.debug.coreinstalledPHPDefaults=org.eclipse.php.debug.core.zendDebugger\=PHP
+org.eclipse.php.debug.coreinstalledPHPInis=C\:\\Program Files\\PHP\\php.ini
+org.eclipse.php.debug.coreinstalledPHPLocations=C\:\\Program Files\\PHP\\php.exe
+org.eclipse.php.debug.coreinstalledPHPNames=PHP
+org.eclipse.php.debug.corephp_versions=null

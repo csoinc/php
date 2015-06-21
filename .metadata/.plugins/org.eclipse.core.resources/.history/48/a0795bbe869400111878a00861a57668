@@ -1,0 +1,40 @@
+<?php
+
+class Messages extends CI_Model {
+
+  function __construct()
+  {
+    // Call the Model constructor
+    parent::__construct();
+    $this->load->database();
+    $this->load->library('encrypt');
+    $this->load->library('session');
+    $this->load->library('email');
+  }
+
+  function send($to, $subject, $message)
+  {
+    $config['protocol'] = 'sendmail';
+    $config['mailpath'] = '/usr/sbin/sendmail';
+    $config['charset'] = 'utf-8';
+    $config['wordwrap'] = TRUE;
+
+    $this->email->initialize($config);
+
+    $this->email->from('your@example.com', 'Your Name');
+    $this->email->to('someone@example.com');
+    $this->email->cc('another@another-example.com');
+    $this->email->bcc('them@their-example.com');
+     
+    $this->email->subject('Email Test');
+    $this->email->message('Testing the email class.');
+     
+    $this->email->send();
+     
+    //echo $this->email->print_debugger();
+
+     
+  }
+
+
+}

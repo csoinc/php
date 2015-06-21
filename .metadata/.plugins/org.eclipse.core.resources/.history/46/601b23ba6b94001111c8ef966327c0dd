@@ -1,0 +1,866 @@
+<?php
+class Clientorderitems extends CI_Controller {
+  private $title;
+  private $trip;
+
+  public function __construct()
+  {
+    parent::__construct();
+    $this->load->library('template');
+    $this->load->library('session');
+    $this->load->library('pagination');
+    $this->load->library('table');
+    $this->load->library('form_validation');
+    $this->load->library('upload');
+
+    $this->load->helper(array('form', 'url'));
+    $this->load->language('properties');
+
+    $this->load->model('orders');
+    $this->load->model('clients');
+    $this->load->model('styles');
+    $this->load->model('items');
+    $this->load->model('stocks');
+    $this->load->model('codes');
+    $this->load->model('artworks');
+
+    $this->title = "Client Order Items";
+    $this->trip = '<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Clients';
+    $this->trip = $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Orders';
+    $this->trip = $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Items';
+  }
+
+  public function select($clients_start = 0, $clientid = 0, $orderid = 0, $message = '')
+  {
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_read($uf_orders) || $this->codes->role_order_update($uf_orders)) {
+        $data['clients_start'] = $clients_start;
+        $data['clientid'] = $clientid;
+        $data['orderid'] = $orderid;
+
+        $order = $this->orders->select_order_by_id($orderid);
+        $data['order'] = $order;
+        $data['orderstatus_list'] = $this->codes->select_codes_by_codetype('OrderStatus');
+        $data['orderstatus_options'] = 'id="colours" size="1"';
+
+        $data['artworkstatus_list'] = $this->codes->select_codes_by_codetype('ArtworkStatus');
+        $data['artworkstatus_options'] = 'id="artworkstatus" size="1"';
+        $data['artworksource_list'] = $this->codes->select_codes_by_codetype('ArtworkSource');
+        $data['artworksource_options'] = 'id="artworksource" size="1"';
+
+        $data['order_artworks'] = $this->artworks->select_artworks_by_order($orderid);
+
+        $this->template->write_view('header', 'common/admin_header');
+        $this->template->write('message', $message);
+        $this->template->write('title', $this->title.' : '.$order->contact.' ('.$order->name.')');
+        $this->template->write('trip', $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;'.$order->contact.' ('.$order->name.')');
+
+        if ($data['rows'] = $this->stocks->select_stocks_by_order($orderid)) {
+
+          $table_settings=array(
+                        'table_open' => '<table class="printTable">',
+                        'heading_row_start' => '<tr class="rowOdd">',
+                        'row_start' => '<tr class="rowEven">',
+                        'row_alt_start' => '<tr class="rowOdd">'
+          );
+          $this->table->set_template($table_settings); //apply the settings
+
+          $this->table->set_heading('Custom Order');
+
+          foreach($data['rows']->result() as $row)
+          {
+            $style = $this->styles->select_style_by_id($row->styleid);
+
+            $print_col = sprintf('<a href="javascript:onClick=printPage()" title="Order - Print"><img src="/images/icons/icon_print.gif" /></a>');
+            $edit_col = sprintf('<a href="/clientorderitems/form_item/%d/%d/%s/%d" title="Client Order Item - Edit"><img src="/images/icons/icon_edit.gif" /></a>',$clients_start,$clientid,$orderid,$row->stockid);
+
+            $item_table = '<table style="width:100%;border=1px">';
+            $item_table = $item_table.'<tr><th>'.$row->itemname.'</th></tr>';
+            $item_table = $item_table.'<tr><td>Item Code: '.$row->itemcode.'<br>';
+            $item_table = $item_table.'Style Colour: '.$style->colorname.'<br>';
+            $item_table = $item_table.'Comments: '.$row->description.'&nbsp;'.$row->comments.'</td></tr>';
+            $item_table = $item_table.'</table>';
+
+            $sizes_table = '<table style="width:100%;border=1px">';
+            $sizes_table = $sizes_table.'<tr><th>Size</th><th>Qty</th><th>Numbers</th></tr>';
+            $sizes_table = $sizes_table.'<tr><td>XS</td><td>'.abs($row->xsmall).'</td><td>'.$row->xsmallnumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>S</td><td>'.abs($row->small).'</td><td>'.$row->smallnumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>M</td><td>'.abs($row->medium).'</td><td>'.$row->mediumnumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>L</td><td>'.abs($row->large).'</td><td>'.$row->largenumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>XL</td><td>'.abs($row->xlarge).'</td><td>'.$row->xlargenumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td>XXL</td><td>'.abs($row->xxlarge).'</td><td>'.$row->xxlargenumbers.'</td></tr>';
+            $sizes_table = $sizes_table.'<tr><td><b>Total&nbsp;</b></td><td>'.abs($row->subtotal).'</td><td></td></tr>';
+            $sizes_table = $sizes_table.'</table>';
+
+
+            $design_table = '<table style="width:100%;border=1px">';
+            $design_table = $design_table.'<tr><th></th><th>Team Name or Logo</th><th>Number</th></tr>';
+            $design_table = $design_table.'<tr><td>Front</td><td align="center">'.$row->frontlogoname.'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->frontlogopos,"FrontLogoPos").'<br>';
+            $design_table = $design_table.$row->frontlogocolor.'<br>';
+            $design_table = $design_table.$row->frontlogotrimcolor.'</td>';
+            $design_table = $design_table.'<td align="center">'.$this->codes->select_name_by_value($row->frontnumsize,"NumSize").'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->frontnumpos,"FrontNumPos").'<br>';
+            $design_table = $design_table.$row->frontnumcolor.'<br>';
+            $design_table = $design_table.$row->frontnumtrimcolor.'</td></tr>';
+
+            $design_table = $design_table.'<tr><td>Back</td><td align="center">'.$row->rearlogoname.'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->rearlogopos,"RearLogoPos").'<br>';
+            $design_table = $design_table.$row->rearlogocolor.'<br>';
+            $design_table = $design_table.$row->rearlogotrimcolor.'<br>';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->rearname,"RearLogPos").'</td>';
+            $design_table = $design_table.'<td align="center">'.$this->codes->select_name_by_value($row->rearnumsize,"NumSize").'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->rearnumpos,"RearNumPos").'<br>';
+            $design_table = $design_table.$row->rearnumcolor.'<br>';
+            $design_table = $design_table.$row->rearnumtrimcolor.'</td></tr>';
+
+            $design_table = $design_table.'<tr><td>Shorts</td><td align="center">'.$row->sidelogoname.'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->sidelogopos,"ShortLogoPos").'<br>';
+            $design_table = $design_table.$row->sidelogocolor.'<br>';
+            $design_table = $design_table.$row->sidelogotrimcolor.'</td>';
+            $design_table = $design_table.'<td align="center">'.$this->codes->select_name_by_value($row->sidenumsize,"NumSize").'<br><small>on</small>&nbsp;';
+            $design_table = $design_table.$this->codes->select_name_by_value($row->sidenumpos,"ShortNumPos").'<br>';
+            $design_table = $design_table.$row->sidenumcolor.'<br>';
+            $design_table = $design_table.$row->sidenumtrimcolor.'</td></tr>';
+            $design_table = $design_table.'</table>';
+
+            $this->table->add_row($item_table.''.$design_table.''.$sizes_table.''.$edit_col.'&nbsp;&nbsp;'.$print_col);
+          }
+          $data['client_order_items_table'] = $this->table->generate();
+        }
+        $this->template->write_view('content', 'client_order_items', $data);
+
+        // Write to $content
+        $this->template->write_view('footer', 'common/footer');
+        // Render the template
+        $this->template->render();
+      }
+      else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function form_item($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $message = '')
+  {
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        $this->trip = $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Edit/Add Items/Artworks';
+
+        $data['clients_start'] = $clients_start;
+        $data['clientid'] = $clientid;
+        $data['orderid'] = $orderid;
+        if ($clientid != 0) $data['client'] = $this->clients->select($clientid);
+        $data['stocks_edit'] = $stocks_edit;
+        $data['artworks_edit'] = $artworks_edit;
+
+        if ($stocks_edit != 0) {
+          $stock = $this->stocks->select_stock_by_id($stocks_edit);
+
+          $data['frontlogopos_list'] = $this->codes->select_codes_by_codetype('FrontLogoPos');
+          $data['frontlogopos_options'] = 'id="frontlogopos" size="1"';
+
+          $data['frontnumpos_list'] = $this->codes->select_codes_by_codetype('FrontNumPos');
+          $data['frontnumpos_options'] = 'id="frontnumpos" size="1"';
+
+          $data['numsize_list'] = $this->codes->select_codes_by_codetype('NumSize');
+          $data['numsize_options'] = 'size="4"';
+
+          $data['artworkcolour_list'] = $this->codes->select_codes_by_codetype('ArtworkColour');
+          $data['artworkcolour_options'] = 'size="1"';
+
+          $data['rearlogopos_list'] = $this->codes->select_codes_by_codetype('RearLogoPos');
+          $data['rearlogopos_options'] = 'id="rearlogopos" size="1"';
+
+          $data['rearnumpos_list'] = $this->codes->select_codes_by_codetype('RearNumPos');
+          $data['rearnumpos_options'] = 'id="rearnumpos" size="1"';
+
+          $data['shortlogopos_list'] = $this->codes->select_codes_by_codetype('ShortLogoPos');
+          $data['shortlogopos_options'] = 'id="shortlogopos" size="1"';
+
+          $data['shortnumpos_list'] = $this->codes->select_codes_by_codetype('ShortNumPos');
+          $data['shortnumpos_options'] = 'id="rearnumpos" size="1"';
+
+          $data['items_list'] = $this->items->select_code_items();
+          $data['items_options'] = 'id="items" size="1" onchange="this.form.submit();"';
+
+          $data['styles_list'] = $this->styles->select_code_styles($stock->itemcode);
+          $data['styles_options'] = 'id="items" size="1" onchange="this.form.submit();"';
+        }
+
+        $data['artworkstatus_list'] = $this->codes->select_codes_by_codetype('ArtworkStatus');
+        $data['artworkstatus_options'] = 'id="artworkstatus" size="1"';
+        $data['artworksource_list'] = $this->codes->select_codes_by_codetype('ArtworkSource');
+        $data['artworksource_options'] = 'id="artworksource" size="1"';
+
+        $order = $this->orders->select_order_by_id($orderid);
+        $data['order'] = $order;
+
+        $data['items_list'] = $this->items->select_code_items();
+        $data['items_options'] = 'id="items" size="1" onchange="this.form.submit();"';
+        $data['itemcode'] = '';
+        $data['styleid'] = '';
+
+        $this->template->write_view('header', 'common/admin_header');
+        $this->template->write('message', $message);
+        $this->template->write('title', $this->title.' : '.$order->contact.' ('.$order->name.')');
+        $this->template->write('trip', $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;'.$order->contact.' ('.$order->name.')');
+
+
+        $data['order_stocks'] = $this->stocks->select_stocks_by_order($orderid);
+        $data['order_artworks'] = $this->artworks->select_artworks_by_order($orderid);
+
+        $this->template->write_view('content', 'client_order_items_form', $data);
+
+        // Write to $content
+        $this->template->write_view('footer', 'common/footer');
+        // Render the template
+        $this->template->render();
+      } else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function form_select_item($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $message = '')
+  {
+    $this->form_validation->set_rules('itemcode', 'ItemCode', 'trim|required|min_length[3]|max_length[12]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        $this->trip = $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Add New Item';
+
+        $data['clients_start'] = $clients_start;
+        $data['clientid'] = $clientid;
+        $data['orderid'] = $orderid;
+        $data['client'] = $this->clients->select($clientid);
+        $data['stocks_edit'] = $stocks_edit;
+        $data['artworks_edit'] = $artworks_edit;
+
+        $order = $this->orders->select_order_by_id($orderid);
+        $data['order'] = $order;
+
+        $data['items_list'] = $this->items->select_code_items();
+        $data['items_options'] = 'id="items" size="1" onchange="this.form.submit();"';
+
+        if ($this->form_validation->run() == TRUE)
+        {
+          $itemcode = $this->input->get_post('itemcode',TRUE);
+          $data['itemcode'] = $itemcode;
+
+          $data['styleid'] = '';
+          $data['styles_list'] = $this->styles->select_code_styles($itemcode);
+          $data['styles_options'] = 'id="items" size="1" onchange="this.form.submit();"';
+
+          $this->template->write_view('header', 'common/admin_header');
+          $this->template->write('message', $message);
+          $this->template->write('title', $this->title.' : '.$order->contact.' ('.$order->name.')');
+          $this->template->write('trip', $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;'.$order->contact.' ('.$order->name.')');
+
+          $data['order_stocks'] = $this->stocks->select_stocks_by_order($orderid);
+          $data['order_artworks'] = $this->artworks->select_artworks_by_order($orderid);
+          $data['artworkstatus_list'] = $this->codes->select_codes_by_codetype('ArtworkStatus');
+          $data['artworkstatus_options'] = 'id="artworkstatus" size="1"';
+          $data['artworksource_list'] = $this->codes->select_codes_by_codetype('ArtworkSource');
+          $data['artworksource_options'] = 'id="artworksource" size="1"';
+
+          $this->template->write_view('content', 'client_order_items_form', $data);
+
+          // Write to $content
+          $this->template->write_view('footer', 'common/footer');
+          // Render the template
+          $this->template->render();
+        } else {
+          redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/0/0/Failed_on_validate_input_data', 'refresh');
+        }
+      } else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function form_select_style($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $itemcode = 0, $message = '')
+  {
+    $this->form_validation->set_rules('styleid', 'StyleId', 'trim|required|min_length[3]|max_length[45]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        $this->trip = $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;Add New Item';
+
+        $data['clients_start'] = $clients_start;
+        $data['clientid'] = $clientid;
+        $data['orderid'] = $orderid;
+        $data['client'] = $this->clients->select($clientid);
+
+        $order = $this->orders->select_order_by_id($orderid);
+        $data['order'] = $order;
+
+        $data['items_list'] = $this->items->select_code_items();
+        $data['items_options'] = 'id="items" size="1" onchange="this.form.submit();"';
+        $data['itemcode'] = $itemcode;
+        $data['stocks_edit'] = $stocks_edit;
+        $data['artworks_edit'] = $artworks_edit;
+
+        if ($this->form_validation->run() == TRUE)
+        {
+          $styleid = $this->input->get_post('styleid',TRUE);
+          $data['styleid'] = $styleid;
+
+          $data['styles_list'] = $this->styles->select_code_styles($itemcode);
+          $data['styles_options'] = 'id="items" size="1" onchange="this.form.submit();"';
+
+          $data['frontlogopos'] = '1';
+          $data['frontlogopos_list'] = $this->codes->select_codes_by_codetype('FrontLogoPos');
+          $data['frontlogopos_options'] = 'id="frontlogopos" size="1"';
+
+          $data['frontnumpos'] = '1';
+          $data['frontnumpos_list'] = $this->codes->select_codes_by_codetype('FrontNumPos');
+          $data['frontnumpos_options'] = 'id="frontnumpos" size="1"';
+
+          $data['frontnumsize'] = '';
+          $data['numsize_list'] = $this->codes->select_codes_by_codetype('NumSize');
+          $data['numsize_options'] = 'size="4"';
+
+          $data['artworkcolour_list'] = $this->codes->select_codes_by_codetype('ArtworkColour');
+          $data['artworkcolour_options'] = 'size="1"';
+          $data['frontlogocolor'] = '';
+          $data['frontlogotrimcolor'] = '';
+          $data['frontnumcolor'] = '';
+          $data['frontnumtrimcolor'] = '';
+
+          $data['rearlogopos'] = '1';
+          $data['rearlogopos_list'] = $this->codes->select_codes_by_codetype('RearLogoPos');
+          $data['rearlogopos_options'] = 'id="rearlogopos" size="1"';
+
+          $data['rearnumpos'] = '1';
+          $data['rearnumpos_list'] = $this->codes->select_codes_by_codetype('RearNumPos');
+          $data['rearnumpos_options'] = 'id="rearnumpos" size="1"';
+
+          $data['rearnumsize'] = '';
+          $data['rearlogocolor'] = '';
+          $data['rearlogotrimcolor'] = '';
+          $data['rearnumcolor'] = '';
+          $data['rearnumtrimcolor'] = '';
+
+
+          $data['shortlogopos'] = '1';
+          $data['shortlogopos_list'] = $this->codes->select_codes_by_codetype('ShortLogoPos');
+          $data['shortlogopos_options'] = 'id="shortlogopos" size="1"';
+
+          $data['shortnumpos'] = '1';
+          $data['shortnumpos_list'] = $this->codes->select_codes_by_codetype('ShortNumPos');
+          $data['shortnumpos_options'] = 'id="rearnumpos" size="1"';
+
+          $this->template->write_view('header', 'common/admin_header');
+          $this->template->write('message', $message);
+          $this->template->write('title', $this->title.' : '.$order->contact.' ('.$order->name.')');
+          $this->template->write('trip', $this->trip.'&nbsp;<img src="/images/icons/icon_arrow_right.gif" />&nbsp;'.$order->contact.' ('.$order->name.')');
+
+
+          $data['order_stocks'] = $this->stocks->select_stocks_by_order($orderid);
+          $data['order_artworks'] = $this->artworks->select_artworks_by_order($orderid);
+          $data['artworkstatus_list'] = $this->codes->select_codes_by_codetype('ArtworkStatus');
+          $data['artworkstatus_options'] = 'id="artworkstatus" size="1"';
+          $data['artworksource_list'] = $this->codes->select_codes_by_codetype('ArtworkSource');
+          $data['artworksource_options'] = 'id="artworksource" size="1"';
+
+          $this->template->write_view('content', 'client_order_items_form', $data);
+
+          // Write to $content
+          $this->template->write_view('footer', 'common/footer');
+          // Render the template
+          $this->template->render();
+        } else {
+          redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/0/0/Failed_on_validate_input_data', 'refresh');
+        }
+      } else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function update_order_client($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $message = '')
+  {
+    $this->form_validation->set_rules('name', 'Name', 'trim|required|min_length[8]|max_length[200]|xss_clean');
+    $this->form_validation->set_rules('contact', 'Contact', 'trim|required|min_length[3]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('email', 'Email', 'trim|email|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('telephone', 'Telephone', 'trim|required|min_length[8]|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('cellphone', 'Cellphone', 'trim|min_length[8]|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('address', 'Address', 'trim|required|min_length[8]|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('zipcode', 'Zipcode', 'trim|required|min_length[3]|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('shippingaddr', 'ShippingAddr', 'trim|required|min_length[8]|max_length[100]|xss_clean');
+    $this->form_validation->set_rules('shippingzip', 'ShippingZip', 'trim|required|min_length[3]|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('orderdate', 'Requireddate', 'trim|required|date|xss_clean');
+    $this->form_validation->set_rules('requireddate', 'Requireddate', 'trim|required|date|xss_clean');
+    $this->form_validation->set_rules('payment', 'Payment', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('expdate', 'Expdate', 'trim|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('comments', 'Comments', 'trim|max_length[200]|xss_clean');
+
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_orders');
+      if ($this->codes->role_order_update($uf_uniforms)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          $name = $this->input->get_post('name',TRUE);
+          $contact = $this->input->get_post('contact',TRUE);
+          $email = $this->input->get_post('email',TRUE);
+          $telephone = $this->input->get_post('telephone',TRUE);
+          $cellphone = $this->input->get_post('cellphone',TRUE);
+          $address = $this->input->get_post('address',TRUE);
+          $zipcode = $this->input->get_post('zipcode',TRUE);
+          $shippingaddr = $this->input->get_post('shippingaddr',TRUE);
+          $shippingzip = $this->input->get_post('shippingzip',TRUE);
+          $orderdate = $this->input->get_post('orderdate',TRUE);
+          $requireddate = $this->input->get_post('requireddate',TRUE);
+          $payment = $this->input->get_post('payment',TRUE);
+          $expdate = $this->input->get_post('expdate',TRUE);
+          $comments = $this->input->get_post('comments',TRUE);
+          $createdby = $this->session->userdata('uf_username');
+
+          if ($this->orders->update_client($orderid,$clientid,$name,$contact,$email,$telephone,$cellphone,$address,$zipcode,$shippingaddr,$shippingzip,$orderdate,$requireddate,$payment,$expdate,$comments,$createdby)) {
+            redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Successful_on_update_this_order_client', 'refresh');
+          } else {
+            redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Nothing_updated_on_this_order_client', 'refresh');
+          }
+        } else {
+          redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Failed_on_validate_input_data', 'refresh');
+        }
+      } else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+
+  }
+
+  public function insert_item($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $itemcode = '', $styleid = 0, $message = '')
+  {
+    $this->form_validation->set_rules('description', 'Description', 'trim|max_length[250]|xss_clean');
+    $this->form_validation->set_rules('frontlogopos', 'FrontLogoPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('frontlogoname', 'FrontLogoName', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontlogocolor', 'FrontLogoColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontlogotrimcolor', 'FrontLogoTrimColor', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontnumpos', 'FrontNumPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('frontnumsize', 'FrontNumSize', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('frontnumcolor', 'FrontNumColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontnumtrimcolor', 'FrontNumTrimColor', 'trim|max_length[50]|xss_clean');
+
+    $this->form_validation->set_rules('rearlogopos', 'RearLogoPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('rearlogoname', 'RearLogoName', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearlogocolor', 'RearLogoColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearlogotrimcolor', 'RearLogoTrimColor', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearnumpos', 'RearNumPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('rearnumsize', 'RearNumSize', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('rearnumcolor', 'RearNumColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearnumtrimcolor', 'RearNumTrimColor', 'trim|max_length[50]|xss_clean');
+
+    $this->form_validation->set_rules('shortlogopos', 'ShortLogoPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('shortnumpos', 'ShortNumPos', 'trim|required|xss_clean');
+
+    $this->form_validation->set_rules('xsmall', 'Xsmall', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('xsmallnumbers', 'XsmallNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('small', 'Small', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('smallnumbers', 'SmallNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('medium', 'Medium', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('mediumnumbers', 'MediumNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('large', 'Large', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('largenumbers', 'LargeNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('xlarge', 'Xlarge', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('xlargenumbers', 'XlargeNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('xxlarge', 'Xxlarge', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('xxlargenumbers', 'XxlargeNumbers', 'trim|max_length[250]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          $description = $this->input->get_post('description',TRUE);
+
+          $frontlogopos = $this->input->get_post('frontlogopos',TRUE);
+          $frontlogoname = $this->input->get_post('frontlogoname',TRUE);
+          $frontlogocolor = $this->input->get_post('frontlogocolor',TRUE);
+          $frontlogotrimcolor = $this->input->get_post('frontlogotrimcolor',TRUE);
+          $frontnumpos = $this->input->get_post('frontnumpos',TRUE);
+          $frontnumsize = $this->input->get_post('frontnumsize',TRUE);
+          $frontnumcolor = $this->input->get_post('frontnumcolor',TRUE);
+          $frontnumtrimcolor = $this->input->get_post('frontnumtrimcolor',TRUE);
+
+          $rearlogopos = $this->input->get_post('rearlogopos',TRUE);
+          $rearlogoname = $this->input->get_post('rearlogoname',TRUE);
+          $rearlogocolor = $this->input->get_post('rearlogocolor',TRUE);
+          $rearlogotrimcolor = $this->input->get_post('rearlogotrimcolor',TRUE);
+          $rearnumpos = $this->input->get_post('rearnumpos',TRUE);
+          $rearnumsize = $this->input->get_post('rearnumsize',TRUE);
+          $rearnumcolor = $this->input->get_post('rearnumcolor',TRUE);
+          $rearnumtrimcolor = $this->input->get_post('rearnumtrimcolor',TRUE);
+
+          $shortlogopos = $this->input->get_post('shortlogopos',TRUE);
+          $shortnumpos = $this->input->get_post('shortnumpos',TRUE);
+
+          $xsmallnumbers = $this->input->get_post('xsmallnumbers',TRUE);
+          $smallnumbers = $this->input->get_post('smallnumbers',TRUE);
+          $mediumnumbers = $this->input->get_post('mediumnumbers',TRUE);
+          $largenumbers = $this->input->get_post('largenumbers',TRUE);
+          $xlargenumbers = $this->input->get_post('xlargenumbers',TRUE);
+          $xxlargenumbers = $this->input->get_post('xxlargenumbers',TRUE);
+
+          $xsmall = $this->input->get_post('xsmall',TRUE) == ''? 0 : abs($this->input->get_post('xsmall',TRUE)) * -1;
+          $small = $this->input->get_post('small',TRUE) == ''? 0 : abs($this->input->get_post('small',TRUE)) * -1;
+          $medium = $this->input->get_post('medium',TRUE) == ''? 0 : abs($this->input->get_post('medium',TRUE)) * -1;
+          $large = $this->input->get_post('large',TRUE) == ''? 0 : abs($this->input->get_post('large',TRUE)) * -1;
+          $xlarge = $this->input->get_post('xlarge',TRUE) == ''? 0 : abs($this->input->get_post('xlarge',TRUE)) * -1;
+          $xxlarge = $this->input->get_post('xxlarge',TRUE) == ''? 0 : abs($this->input->get_post('xxlarge',TRUE)) * -1;
+
+          $code = 'Order';
+          $comments = ''; //$this->input->get_post('comments',TRUE);
+
+          if ($stockid = $this->stocks->insert_order($itemcode, $styleid, $code, $orderid, $description)) {
+            $this->stocks->update_order_stock($stockid, $orderid, $xsmall, $small, $medium, $large, $xlarge, $xxlarge, $comments);
+            $this->stocks->update_order_front($stockid, $orderid, $frontnumpos, $frontnumsize, $frontnumcolor, $frontnumtrimcolor, $frontlogopos, $frontlogoname, $frontlogocolor, $frontlogotrimcolor);
+            $this->stocks->update_order_rear($stockid, $orderid, $rearnumpos, $rearnumsize, $rearnumcolor, $rearnumtrimcolor, $rearlogopos, $rearlogoname, $rearlogocolor, $rearlogotrimcolor);
+            $this->stocks->update_order_short($stockid, $orderid, $shortnumpos, $shortlogopos);
+            redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Successful_on_add_item_to_this_order', 'refresh');
+          }
+          redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Nothing_added_to_this_order', 'refresh');
+        } else {
+          redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Failed_on_validate_input_data', 'refresh');
+        }
+      } else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+
+  }
+
+  public function update_status($clients_start = 0, $clientid = 0, $orderid = 0, $message = '')
+  {
+    $this->form_validation->set_rules('orderstatus', 'OrderStatus', 'trim|xss_clean');
+    $this->form_validation->set_rules('updcomment', 'UpdComment', 'trim|max_length[100]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          $orderstatus = $this->input->get_post('orderstatus',TRUE);
+          $updcomment = $this->input->get_post('updcomment',TRUE);
+          $updby = $this->session->userdata('uf_username');
+
+          if ($this->orders->update_status($orderid, $orderstatus, $updcomment, $updby)) {
+            redirect('/clientorderitems/select/'.$clients_start.'/'.$clientid.'/'.$orderid.'/Successful_on_update_this_order_status', 'refresh');
+          }
+          redirect('/clientorderitems/select/'.$clients_start.'/'.$clientid.'/'.$orderid.'/Nothing_update_on_this_order_status', 'refresh');
+        } else {
+          redirect('/clientorderitems/select/'.$clients_start.'/'.$clientid.'/'.$orderid.'/Failed_on_validate_input_data', 'refresh');
+        }
+      } else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function insert_artwork($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $message = '')
+  {
+    $this->form_validation->set_rules('artworksource', 'ArtworkSource', 'trim|xss_clean');
+    $this->form_validation->set_rules('artworkstatus', 'ArtworkStatue', 'trim|xss_clean');
+    $this->form_validation->set_rules('comment', 'Comment', 'trim|max_length[100]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          $artworksource = $this->input->get_post('artworksource',TRUE);
+          $artworkstatus = $this->input->get_post('artworkstatus',TRUE);
+          $comment = $this->input->get_post('comment',TRUE);
+          $uploadby = $this->session->userdata('uf_username');
+
+          if ($artworkid = $this->artworks->insert_artwork($artworksource, $artworkstatus, $comment, $orderid, $stocks_edit, $uploadby)) {
+            $config['upload_path'] = './artworks/';
+            $config['allowed_types'] = 'gif|jpg|png|doc|pdf|xls';
+            $config['overwrite'] = TRUE;
+            $config['max_size'] = '10240';
+            //$config['max_width'] = '1024';
+            //$config['max_height'] = '768';
+            $config['file_name'] = 'artwork-'.$orderid.'-'.$artworkid;
+
+            $this->upload->initialize($config);
+            if (!$this->upload->do_upload('filename'))
+            {
+              $upload = $this->upload->display_errors();
+            }
+            else
+            {
+              $upload = $this->upload->data();
+              $this->artworks->update_filename($artworkid, $upload['file_name']);
+            }
+            redirect('/clientorderitems/select/'.$clients_start.'/'.$clientid.'/'.$orderid.'/Successful_on_add_this_order_artwork', 'refresh');
+          }
+          redirect('/clientorderitems/select/'.$clients_start.'/'.$clientid.'/'.$orderid.'/Nothing_added_on_this_order_artwork', 'refresh');
+        } else {
+          redirect('/clientorderitems/select/'.$clients_start.'/'.$clientid.'/'.$orderid.'/Failed_on_validate_input_data', 'refresh');
+        }
+      } else {
+        redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+      }
+    } else {
+      redirect('/accounts/index/', 'refresh');
+    }
+  }
+
+  public function update_item($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $message = '')
+  {
+    $this->form_validation->set_rules('itemcode', 'ItemCode', 'trim|required|max_length[45]|xss_clean');
+    $this->form_validation->set_rules('styleid', 'StyleId', 'trim|xss_clean');
+
+    $this->form_validation->set_rules('description', 'Description', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('frontlogopos', 'FrontLogoPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('frontlogoname', 'FrontLogoName', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontlogocolor', 'FrontLogoColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontlogotrimcolor', 'FrontLogoTrimColor', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontnumpos', 'FrontNumPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('frontnumsize', 'FrontNumSize', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('frontnumcolor', 'FrontNumColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('frontnumtrimcolor', 'FrontNumTrimColor', 'trim|max_length[50]|xss_clean');
+
+    $this->form_validation->set_rules('rearlogopos', 'RearLogoPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('rearlogoname', 'RearLogoName', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearlogocolor', 'RearLogoColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearlogotrimcolor', 'RearLogoTrimColor', 'trim|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearnumpos', 'RearNumPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('rearnumsize', 'RearNumSize', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('rearnumcolor', 'RearNumColor', 'trim|required|min_length[2]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('rearnumtrimcolor', 'RearNumTrimColor', 'trim|max_length[50]|xss_clean');
+
+    $this->form_validation->set_rules('shortlogopos', 'ShortLogoPos', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('shortnumpos', 'ShortNumPos', 'trim|required|xss_clean');
+
+    $this->form_validation->set_rules('xsmall', 'Xsmall', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('xsmallnumbers', 'XsmallNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('small', 'Small', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('smallnumbers', 'SmallNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('medium', 'Medium', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('mediumnumbers', 'MediumNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('large', 'Large', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('largenumbers', 'LargeNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('xlarge', 'Xlarge', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('xlargenumbers', 'XlargeNumbers', 'trim|max_length[250]|xss_clean');
+
+    $this->form_validation->set_rules('xxlarge', 'Xxlarge', 'trim|numeric|xss_clean');
+    $this->form_validation->set_rules('xxlargenumbers', 'XxlargeNumbers', 'trim|max_length[250]|xss_clean');
+    $this->form_validation->set_rules('comments', 'Comments', 'trim|max_length[250]|xss_clean');
+
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if ($this->codes->role_order_update($uf_orders)) {
+        if ($this->form_validation->run() == TRUE)
+        {
+          $itemcode = $this->input->get_post('itemcode',TRUE);
+          //$order = $this->orders->select_order_by_id($orderid);
+          $stockid = $stocks_edit;
+          $stock = $this->stocks->select_stock_by_id($stocks_edit);
+
+          if ($itemcode !== $stock->itemcode) {
+            $this->stocks->update_order_item($stockid, $orderid, $itemcode, 0);
+          } else {
+            $styleid = $this->input->get_post('styleid',TRUE);
+            $description = $this->input->get_post('description',TRUE);
+            $this->stocks->update_order_style($stockid, $orderid, $styleid, $description);
+          }
+          $frontlogopos = $this->input->get_post('frontlogopos',TRUE);
+          $frontlogoname = $this->input->get_post('frontlogoname',TRUE);
+          $frontlogocolor = $this->input->get_post('frontlogocolor',TRUE);
+          $frontlogotrimcolor = $this->input->get_post('frontlogotrimcolor',TRUE);
+          $frontnumpos = $this->input->get_post('frontnumpos',TRUE);
+          $frontnumsize = $this->input->get_post('frontnumsize',TRUE);
+          $frontnumcolor = $this->input->get_post('frontnumcolor',TRUE);
+          $frontnumtrimcolor = $this->input->get_post('frontnumtrimcolor',TRUE);
+
+          $rearlogopos = $this->input->get_post('rearlogopos',TRUE);
+          $rearlogoname = $this->input->get_post('rearlogoname',TRUE);
+          $rearlogocolor = $this->input->get_post('rearlogocolor',TRUE);
+          $rearlogotrimcolor = $this->input->get_post('rearlogotrimcolor',TRUE);
+          $rearnumpos = $this->input->get_post('rearnumpos',TRUE);
+          $rearnumsize = $this->input->get_post('rearnumsize',TRUE);
+          $rearnumcolor = $this->input->get_post('rearnumcolor',TRUE);
+          $rearnumtrimcolor = $this->input->get_post('rearnumtrimcolor',TRUE);
+
+          $shortlogopos = $this->input->get_post('shortlogopos',TRUE);
+          $shortnumpos = $this->input->get_post('shortnumpos',TRUE);
+
+          $xsmallnumbers = $this->input->get_post('xsmallnumbers',TRUE);
+          $smallnumbers = $this->input->get_post('smallnumbers',TRUE);
+          $mediumnumbers = $this->input->get_post('mediumnumbers',TRUE);
+          $largenumbers = $this->input->get_post('largenumbers',TRUE);
+          $xlargenumbers = $this->input->get_post('xlargenumbers',TRUE);
+          $xxlargenumbers = $this->input->get_post('xxlargenumbers',TRUE);
+
+          $xsmall = $this->input->get_post('xsmall',TRUE) == ''? 0 : abs($this->input->get_post('xsmall',TRUE)) * -1;
+          $small = $this->input->get_post('small',TRUE) == ''? 0 : abs($this->input->get_post('small',TRUE)) * -1;
+          $medium = $this->input->get_post('medium',TRUE) == ''? 0 : abs($this->input->get_post('medium',TRUE)) * -1;
+          $large = $this->input->get_post('large',TRUE) == ''? 0 : abs($this->input->get_post('large',TRUE)) * -1;
+          $xlarge = $this->input->get_post('xlarge',TRUE) == ''? 0 : abs($this->input->get_post('xlarge',TRUE)) * -1;
+          $xxlarge = $this->input->get_post('xxlarge',TRUE) == ''? 0 : abs($this->input->get_post('xxlarge',TRUE)) * -1;
+
+
+          $comments = $this->input->get_post('comments',TRUE);
+
+          $error = 'Info';
+          if ($this->stocks->update_order_sizes($stockid, $orderid, $xsmall, $small, $medium, $large, $xlarge, $xxlarge, $comments)) {
+            $error = $error.'_sizes_changed';
+          } else {
+            $error = $error.'_sizes_unchanged';
+          }
+          if ($this->stocks->update_order_numbers($stockid, $orderid, $xsmallnumbers, $smallnumbers, $mediumnumbers, $largenumbers, $xlargenumbers, $xxlargenumbers)) {
+            $error = $error.'_numbers_changed';
+          } else {
+            $error = $error.'_numbers_unchanged';
+          }
+
+          if ($this->stocks->update_order_front($stockid, $orderid, $frontnumpos, $frontnumsize, $frontnumcolor, $frontnumtrimcolor, $frontlogopos, $frontlogoname, $frontlogocolor, $frontlogotrimcolor)) {
+            $error = $error.'size_changed';
+          } else {
+            $error = $error.'size_unchanged';
+          }
+
+          if ($this->stocks->update_order_rear($stockid, $orderid, $rearnumpos, $rearnumsize, $rearnumcolor, $rearnumtrimcolor, $rearlogopos, $rearlogoname, $rearlogocolor, $rearlogotrimcolor) ) {
+            $error = $error.'size_changed';
+          } else {
+            $error = $error.'size_unchanged';
+          }
+
+          if ($this->stocks->update_order_short($stockid, $orderid, $shortnumpos, $shortlogopos) ) {
+            $error = $error.'size_changed';
+          } else {
+            $error = $error.'size_unchanged';
+          }
+          redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/'.$error, 'refresh');
+        }
+      } else {
+        redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Failed_on_validate_input_data', 'refresh');
+      }
+    } else {
+      redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+    }
+  } else {
+    redirect('/accounts/index/', 'refresh');
+  }
+
+}
+
+public function update_artwork($clients_start = 0, $clientid = 0, $orderid = 0, $stocks_edit = 0, $artworks_edit = 0, $message = '')
+{
+  $this->form_validation->set_rules('artworksource', 'ArtworkSource', 'trim|xss_clean');
+  $this->form_validation->set_rules('artworkstatus', 'ArtworkStatue', 'trim|xss_clean');
+  $this->form_validation->set_rules('comment', 'Comment', 'trim|max_length[100]|xss_clean');
+
+  if ($this->session->userdata('uf_logged_in')) {
+    $uf_orders = $this->session->userdata('uf_orders');
+    $uf_stocks = $this->session->userdata('uf_stocks');
+    $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+    if ($this->codes->role_order_update($uf_orders)) {
+      if ($this->form_validation->run() == TRUE)
+      {
+        $artworksource = $this->input->get_post('artworksource',TRUE);
+        $artworkstatus = $this->input->get_post('artworkstatus',TRUE);
+        $comment = $this->input->get_post('comment',TRUE);
+        $uploadby = $this->session->userdata('uf_username');
+        $artworkid = $artworks_edit;
+
+        if ($this->artworks->update_artwork($artworkid, $artworksource, $artworkstatus, $comment, $uploadby)) {
+          $config['upload_path'] = './artworks/';
+          $config['allowed_types'] = 'gif|jpg|png|doc|pdf|xls';
+          $config['overwrite'] = TRUE;
+          $config['max_size'] = '10240';
+          //$config['max_width'] = '1024';
+          //$config['max_height'] = '768';
+          $config['file_name'] = 'artwork-'.$orderid.'-'.$artworkid;
+
+          $this->upload->initialize($config);
+          if (!$this->upload->do_upload('filename'))
+          {
+            $upload = $this->upload->display_errors();
+          }
+          else
+          {
+            $upload = $this->upload->data();
+            $this->artworks->update_filename($artworkid, $upload['file_name']);
+          }
+          redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Successful_on_update_this_order_artwork', 'refresh');
+        }
+        redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Nothing_updated_on_this_order_artwork', 'refresh');
+      } else {
+        redirect('/clientorderitems/form_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/Failed_on_validate_input_data', 'refresh');
+      }
+    } else {
+      redirect('/clientorders/select/'.$clients_start.'/'.$clientid.'/0/Unauthorised', 'refresh');
+    }
+  } else {
+    redirect('/accounts/index/', 'refresh');
+  }
+}
+
+
+public function comments()
+{
+  echo 'Client Order Item and Artwork - maintenance.';
+}
+
+}
+?>

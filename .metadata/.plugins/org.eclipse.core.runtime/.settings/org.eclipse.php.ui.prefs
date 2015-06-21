@@ -1,0 +1,13 @@
+cleanup.remove_trailing_whitespaces=false
+cleanup.remove_trailing_whitespaces_all=true
+cleanup.remove_trailing_whitespaces_ignore_empty=false
+eclipse.preferences.version=1
+markOccurrences=false
+org.eclipse.php.core.workspaceDefaultLocale=en_CA
+org.eclipse.php.ui.editor.templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+org.eclipse.php.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+org.eclipse.php.ui.wizards.JSsupport=true
+org.eclipse.php.uihoverModifierMasks=org.eclipse.php.ui.editor.hover.BestMatchHover;0;org.eclipse.php.debug.ui.hovers.PHPDebugTextHover;0;org.eclipse.php.xdebug.ui.hover.XDebugTextHover;0;org.eclipse.php.ui.editor.hover.ProblemHover;0;org.eclipse.php.ui.editor.hover.PHPDocumentationHover;0;org.eclipse.php.ui.editor.hover.PHPSourceTextHover;262144;org.eclipse.php.ui.editor.hover.PHPAnnotationTextHover;0;
+org.eclipse.php.uihoverModifiers=org.eclipse.php.ui.editor.hover.BestMatchHover;0;org.eclipse.php.debug.ui.hovers.PHPDebugTextHover;\!0;org.eclipse.php.xdebug.ui.hover.XDebugTextHover;\!0;org.eclipse.php.ui.editor.hover.ProblemHover;\!0;org.eclipse.php.ui.editor.hover.PHPDocumentationHover;\!0;org.eclipse.php.ui.editor.hover.PHPSourceTextHover;Ctrl;org.eclipse.php.ui.editor.hover.PHPAnnotationTextHover;\!0;
+useAnnotationsPrefPage=true
+useQuickDiffPrefPage=true

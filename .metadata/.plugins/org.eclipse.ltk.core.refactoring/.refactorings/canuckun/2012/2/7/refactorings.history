@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename source module &apos;store/includes/modules/osc8873.product_listing0.php&apos; to &apos;product_listing_v1.0.php&apos;&#x0D;&#x0A;- Original element: &apos;store/includes/modules/osc8873\product_listing0.php&apos;&#x0D;&#x0A;- Renamed element: &apos;store/includes/modules/osc8873\product_listing_v1.0.php&apos;" description="Rename source module &apos;product_listing0.php&apos;" flags="589830" id="org.eclipse.dltk.ui.rename.sourcemodule" input="/&lt;store\/includes\/modules\/osc8873{product_listing0.php" name="product_listing_v1.0.php" stamp="1329422894221" version="1.0"/>
+</session>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;/canuckun/CANUCKBADMINTON.HTML&apos; to &apos;CANUCKBASEBALL.HTML&apos;&#x0D;&#x0A;- Original element: &apos;CANUCKBADMINTON.HTML&apos;" description="Rename resource &apos;CANUCKBADMINTON.HTML&apos;" flags="7" id="org.eclipse.dltk.ui.rename.resource" input="CANUCKBADMINTON.HTML" name="CANUCKBASEBALL.HTML" stamp="1363452663297" version="1.0"/>
+</session>

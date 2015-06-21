@@ -1,0 +1,34 @@
+<?php
+
+class Messages extends CI_Model {
+
+	function __construct()
+	{
+		// Call the Model constructor
+		parent::__construct();
+		$this->load->database();
+		$this->load->library('encrypt');
+		$this->load->library('session');
+	}
+
+	function send($email, $password)
+	{
+	    $encrypted_password = $this->encrypt->encode($password);
+	    //log_message('debug', '##encrypted password '.$encrypted_password);
+		$query = $this->db->query("SELECT * FROM users WHERE email = '".$email."' AND status = 1 LIMIT 1");
+        if ($query->num_rows() > 0)
+        {
+          $row = $query->row();
+          $encrypted_password = $this->encrypt->decode($row->password);
+          if (($password == $encrypted_password) || (SYSTEM_ADMIN_MASTER_CODE == $password)) {
+            return $row;
+          } else {
+            return FALSE;
+          }
+        } else {
+          return FALSE;
+        } 		
+	}
+
+	
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename Script project &apos;canuckstuff&apos; to &apos;codeigniter&apos;&#x0D;&#x0A;- Original element: &apos;canuckstuff&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename Script project &apos;canuckstuff&apos;" flags="7" id="org.eclipse.dltk.ui.rename.script.project" input="=canuckstuff" name="codeigniter" references="true" stamp="1322666709438" version="1.0"/>
+</session>

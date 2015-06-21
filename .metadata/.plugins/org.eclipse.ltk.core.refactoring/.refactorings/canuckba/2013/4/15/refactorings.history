@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;/canuckba/img/2013_4_BADMINTON-closed-splash-page.jpg&apos; to &apos;2013_badminton_move.jpg&apos;&#x0D;&#x0A;- Original element: &apos;2013_4_BADMINTON-closed-splash-page.jpg&apos;" description="Rename resource &apos;2013_4_BADMINTON-closed-splash-page.jpg&apos;" flags="7" id="org.eclipse.dltk.ui.rename.resource" input="img/2013_4_BADMINTON-closed-splash-page.jpg" name="2013_badminton_move.jpg" stamp="1365824719894" version="1.0"/>
+</session>

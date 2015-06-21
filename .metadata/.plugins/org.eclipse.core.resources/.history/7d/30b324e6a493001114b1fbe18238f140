@@ -1,0 +1,378 @@
+<?php echo sprintf('<a href="/clientorderitems/select/%d/%d/%s" title="Back"><img src="/images/buttons/button_back.gif" /></a>', $clients_start, $clientid, $orderid); ?>&nbsp;&nbsp;<br>
+<?php echo form_open('clientorderitems/update_order_client/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit); ?>
+<?php echo validation_errors(); ?>
+<b>Order #:&nbsp;</b><?php echo $order->orderid; ?> 
+<table class="zebraTable">
+<tr class="rowEven"><th colspan="4">Client Information</th><tr>
+
+<tr class="rowOdd"><td>Name</td><td><input type="text" name="contact" value="<?php echo $order->contact; ?>" size="30" maxlength="50"></td>
+<td>Email</td><td><input type="text" name="email" value="<?php echo $order->email; ?>" size="30" maxlength="50"></td></tr>
+
+<tr class="rowEven"><td>Telephone</td><td><input type="text" name="telephone" value="<?php echo $order->telephone; ?>" size="30" maxlength="50"></td>
+<td>Cell Phone</td><td><input type="text" name="cellphone" value="<?php echo $order->cellphone; ?>" size="30" maxlength="50"></td></tr>
+
+<tr class="rowOdd"><td>Date In</td><td><input type="text" name="orderdate" id="update_orderdate" value="<?php echo substr($order->orderdate,0,10); ?>" size="30" maxlength="30"></td>
+<td>Date Needed</td><td><input type="text" name="requireddate" id="update_requireddate" value="<?php echo substr($order->requireddate,0,10); ?>" size="30" maxlength="30"></td></tr>
+
+<tr class="rowEven"><td>School</td><td colspan="3"><input type="text" name="name" value="<?php echo $order->name; ?>" size="120" maxlength="200"></td>
+
+<tr class="rowOdd"><td>Payment</td><td><input type="text" name="payment" value="<?php echo $order->payment; ?>" size="30" maxlength="50"></td>
+<td>Expire Date</td><td><input type="text" name="expdate" value="<?php echo $order->expdate; ?>" size="20" maxlength="50"></td></tr>
+
+<tr class="rowEven"><td>Address</td><td colspan="3"><input type="text" name="address" value="<?php echo $order->address; ?>" size="80" maxlength="100">
+&nbsp;Zip Code&nbsp;<input type="text" name="zipcode" value="<?php echo $order->zipcode; ?>" size="10" maxlength="10"></td></tr>
+
+<tr class="rowOdd"><td>ShippingAddr</td><td colspan="3"><input type="text" name="shippingaddr" value="<?php echo $order->shippingaddr; ?>" size="80" maxlength="100">
+&nbsp;Zip Code&nbsp;<input type="text" name="shippingzip" value="<?php echo $order->shippingzip; ?>" size="10" maxlength="10"></td></tr>
+
+<tr class="rowEven"><td>Comments</td><td colspan="3"><input type="text" name="comments" value="<?php echo $order->comments; ?>" size="120" maxlength="200">
+
+</td></tr>
+
+</table>
+<img src="/images/icons/icon_save.gif" />&nbsp;<input type="submit" value="Update Order Client Info" title="Update Order Client Info" /><br>
+<?php echo form_close(); ?>
+
+
+<?php 
+if ($order_stocks) {
+foreach($order_stocks->result() as $stock) {
+  $style = $this->styles->select_style_by_id($stock->styleid);
+  $edit_col = sprintf('<a href="/clientorderitems/form_item/%d/%d/%s/%d" title="Client Order Item - Edit"><img src="/images/buttons/small_edit.gif" /></a>',$clients_start,$clientid,$orderid,$stock->stockid);
+  if ($stock->stockid == $stocks_edit) {
+?>
+<?php echo form_open('clientorderitems/update_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit); ?>
+<?php echo validation_errors(); ?>
+
+<!-- update item -->
+<table class="zebraTable">
+<tr class="rowEven"><th colspan="4">Update Item</th><tr>
+<tr class="rowOdd"><td>Item</td><td><?php echo form_dropdown('itemcode', $items_list, $stock->itemcode, $items_options); ?>&nbsp;(Select the item for this order)</td></tr>
+<tr class="rowEven"><td>Style</td><td><?php echo form_dropdown('styleid', $styles_list, $stock->styleid, $styles_options); ?>&nbsp;(Select the colour for this item)</td></tr>
+<tr class="rowOdd"><td>Description</td><td colspan="3"><input type="text" name="description" value="<?php echo $stock->description; ?>" size="120" maxlength="250"></td></tr>
+<tr class="rowEven"><th colspan="4">Update Front Design</th><tr>
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo form_dropdown('frontlogopos', $frontlogopos_list, $stock->frontlogopos, $frontlogopos_options); ?>(Select the position for team name or logo)</td></tr>
+<tr class="rowEven"><td>Logo Team Name</td><td><input type="text" name="frontlogoname" value="<?php echo $stock->frontlogoname; ?>" size="40" maxlength="50"></td></tr>
+<tr class="rowOdd"><td>Logo Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontlogocolor', $artworkcolour_list, $stock->frontlogocolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowEven"><td>Logo Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontlogotrimcolor', $artworkcolour_list, $stock->frontlogotrimcolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowOdd"><td>Number Position</td><td><?php echo form_dropdown('frontnumpos', $frontnumpos_list, $stock->frontnumpos, $frontnumpos_options); ?>(Select the position for numbers)</td></tr>
+<tr class="rowEven"><td>Number Size</td><td>
+<?php 
+    foreach ($numsize_list as $key => $value) {
+      if ($stock->frontnumsize == $key) {  
+?>
+<input type="radio" name="frontnumsize" title="<?php echo $value;?>" value="<?php echo $key;?>" checked="checked" ><?php echo $value;?>&nbsp;&nbsp;&nbsp;&nbsp;
+<?php
+      } else {
+?>
+<input type="radio" name="frontnumsize" title="<?php echo $value;?>" value="<?php echo $key;?>" ><?php echo $value;?>&nbsp;&nbsp;&nbsp;&nbsp;
+<?php
+      }
+    }      
+?>
+</td></tr>
+<tr class="rowOdd"><td>Number Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontnumcolor', $artworkcolour_list, $stock->frontnumcolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowEven"><td>Number Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontnumtrimcolor', $artworkcolour_list, $stock->frontnumtrimcolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowEven"><th colspan="4">Update Back Design</th><tr>
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo form_dropdown('rearlogopos', $rearlogopos_list, $stock->rearlogopos, $rearlogopos_options); ?>(Individual name position: Center)</td></tr>
+<tr class="rowEven"><td>Logo Team Name</td><td><input type="text" name="rearlogoname" value="<?php echo $stock->rearlogoname; ?>" size="40" maxlength="50"></td></tr>
+<tr class="rowOdd"><td>Logo Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearlogocolor', $artworkcolour_list, $stock->rearlogocolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowEven"><td>Logo Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearlogotrimcolor', $artworkcolour_list, $stock->rearlogotrimcolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowOdd"><td>Number Position</td><td><?php echo form_dropdown('rearnumpos', $rearnumpos_list, $stock->rearnumpos, $rearnumpos_options); ?>(Select the position for numbers)</td></tr>
+<tr class="rowEven"><td>Number Size</td><td>
+
+<?php foreach ($numsize_list as $key => $value) {
+  if ($stock->rearnumsize == $key) {
+?>
+<input type="radio" name="rearnumsize" title="<?php echo $value;?>" value="<?php echo $key;?>" checked="checked" ><?php echo $value;?>&nbsp;&nbsp;&nbsp;&nbsp;
+<?php
+      } else {
+?>
+<input type="radio" name="rearnumsize" title="<?php echo $value;?>" value="<?php echo $key;?>" ><?php echo $value;?>&nbsp;&nbsp;&nbsp;&nbsp;
+<?php
+      }
+    }      
+?>
+</td></tr>
+<tr class="rowOdd"><td>Number Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearnumcolor', $artworkcolour_list, $stock->rearnumcolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowEven"><td>Number Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearnumtrimcolor', $artworkcolour_list, $stock->rearnumtrimcolor, $artworkcolour_options); ?></td></tr>
+<tr class="rowEven"><th colspan="4">Update Shorts Design</th><tr>
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo form_dropdown('shortlogopos', $shortlogopos_list, $stock->sidelogopos, $shortlogopos_options); ?>(Select the position for team name or logo)</td></tr>
+<tr class="rowEven"><td>Number Position</td><td><?php echo form_dropdown('shortnumpos', $shortnumpos_list, $stock->sidenumpos, $shortnumpos_options); ?>(Select the position for numbers)</td></tr>
+<tr class="rowOdd"><td colspan="2">
+<table style="width:100%;border=1px">
+<tr class="rowEven"><th>Size</th><th>Update Qty</th><th>Update Numbers</th></tr>
+<tr class="rowOdd"><td>XS</td><td><input type="text" name="xsmall" value="<?php echo abs($stock->xsmall); ?>" size="10" maxlength="10" /></td>
+<td><input type="text" name="xsmallnumbers" value="<?php echo $stock->xsmallnumbers; ?>" size="100" maxlength="250" /></td></tr>
+<tr class="rowEven"><td>S</td><td><input type="text" name="small" value="<?php echo abs($stock->small); ?>" size="10" maxlength="10" /></td>
+<td><input type="text" name="smallnumbers" value="<?php echo $stock->smallnumbers; ?>" size="100" maxlength="250" /></td></tr>
+<tr class="rowOdd"><td>M</td><td><input type="text" name="medium" value="<?php echo abs($stock->medium); ?>" size="10" maxlength="10" /></td>
+<td><input type="text" name="mediumnumbers" value="<?php echo $stock->mediumnumbers; ?>" size="100" maxlength="250" /></td></tr>
+<tr class="rowEven"><td>L</td><td><input type="text" name="large" value="<?php echo abs($stock->large); ?>" size="10" maxlength="10" /></td>
+<td><input type="text" name="largenumbers" value="<?php echo $stock->largenumbers; ?>" size="100" maxlength="250" /></td></tr>
+<tr class="rowOdd"><td>XL</td><td><input type="text" name="xlarge" value="<?php echo abs($stock->xlarge); ?>" size="10" maxlength="10" /></td>
+<td><input type="text" name="xlargenumbers" value="<?php echo $stock->xlargenumbers; ?>" size="100" maxlength="250" /></td></tr>
+<tr class="rowEven"><td>XXL</td><td><input type="text" name="xxlarge" value="<?php echo abs($stock->xxlarge); ?>" size="10" maxlength="10" /></td>
+<td><input type="text" name="xxlargenumbers" value="<?php echo $stock->xxlargenumbers; ?>" size="100" maxlength="250" /></td></tr>
+</table>
+</td></tr>
+<tr class="rowOdd"><td>Comments</td><td><input type="text" name="comments" value="<?php echo $stock->comments; ?>" size="120" maxlength="250" /></td></tr>
+<tr class="rowEven"><td colspan="2"><img src="/images/icons/icon_save.gif" />&nbsp;<input type="submit" value="Update Order Item" title="Update Order Item" /></td></tr>
+
+</table>
+
+<?php echo form_close(); ?>
+
+
+<?php 
+  } else {
+?>
+<!-- read only item -->
+<table class="zebraTable">
+<tr class="rowEven"><th colspan="4">Item</th><tr>
+<tr class="rowOdd"><td>Item</td><td><?php echo $stock->itemcode.' - '.$this->items->select_itemname($stock->itemcode); ?></td></tr>
+<tr class="rowEven"><td>Style</td><td><?php echo $style->colorname; ?></td></tr>
+<tr class="rowOdd"><td>Description</td><td colspan="3"><?php echo $stock->description; ?></td></tr>
+<tr class="rowEven"><th colspan="4">Front Design</th><tr>
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo $this->codes->select_name_by_value($stock->frontlogopos, 'FrontLogoPos'); ?></td></tr>
+<tr class="rowEven"><td>Logo Team Name</td><td><?php echo $stock->frontlogoname; ?></td></tr>
+<tr class="rowOdd"><td>Logo Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->frontlogocolor; ?></td></tr>
+<tr class="rowEven"><td>Logo Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->frontlogotrimcolor; ?></td></tr>
+<tr class="rowOdd"><td>Number Position</td><td><?php echo $this->codes->select_name_by_value($stock->frontnumpos, 'FrontNumPos'); ?></td></tr>
+<tr class="rowEven"><td>Number Size</td><td><?php echo $this->codes->select_name_by_value($stock->frontnumsize, 'NumSize'); ?></td></tr>
+<tr class="rowOdd"><td>Number Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->frontnumcolor; ?></td></tr>
+<tr class="rowEven"><td>Number Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->frontnumtrimcolor; ?></td></tr>
+<tr class="rowEven"><th colspan="4">Back Design</th><tr>
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo $this->codes->select_name_by_value($stock->rearlogopos, 'RearLogoPos'); ?></td></tr>
+<tr class="rowEven"><td>Logo Team Name</td><td><?php echo $stock->rearlogoname; ?></td></tr>
+<tr class="rowOdd"><td>Logo Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->rearlogocolor; ?></td></tr>
+<tr class="rowEven"><td>Logo Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->rearlogotrimcolor; ?></td></tr>
+<tr class="rowOdd"><td>Number Position</td><td><?php echo $this->codes->select_name_by_value($stock->rearnumpos, 'RearNumPos'); ?></td></tr>
+<tr class="rowEven"><td>Number Size</td><td><?php echo $this->codes->select_name_by_value($stock->rearnumsize, 'NumSize'); ?></td></tr>
+<tr class="rowOdd"><td>Number Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->rearnumcolor; ?></td></tr>
+<tr class="rowEven"><td>Number Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo $stock->rearnumtrimcolor; ?></td></tr>
+<tr class="rowEven"><th colspan="4">Shorts Design</th><tr>
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo $this->codes->select_name_by_value($stock->sidelogopos, 'ShortLogoPos'); ?></td></tr>
+<tr class="rowEven"><td>Number Position</td><td><?php echo $this->codes->select_name_by_value($stock->sidenumpos, 'ShortNumPos'); ?></td></tr>
+<tr class="rowOdd"><td colspan="2">
+<table style="width:100%;border=1px">
+<tr class="rowEven"><th>Size</th><th>Qty</th><th>Numbers</th></tr>
+<tr class="rowOdd"><td>XS</td><td><?php echo abs($stock->xsmall); ?></td>
+<td><?php echo $stock->xsmallnumbers; ?></td></tr>
+<tr class="rowEven"><td>S</td><td><?php echo abs($stock->small); ?></td>
+<td><?php echo $stock->smallnumbers; ?></td></tr>
+<tr class="rowOdd"><td>M</td><td><?php echo abs($stock->medium); ?></td>
+<td><?php echo $stock->mediumnumbers; ?></td></tr>
+<tr class="rowEven"><td>L</td><td><?php echo abs($stock->large); ?></td>
+<td><?php echo $stock->largenumbers; ?></td></tr>
+<tr class="rowOdd"><td>XL</td><td><?php echo abs($stock->xlarge); ?></td>
+<td><?php echo $stock->xlargenumbers; ?></td></tr>
+<tr class="rowEven"><td>XXL</td><td><?php echo abs($stock->xxlarge); ?></td>
+<td><?php echo $stock->xxlargenumbers; ?></td></tr>
+</table>
+</td></tr>
+<tr class="rowOdd"><td colspan="2">Comments</td><td><?php echo $stock->comments; ?></td></tr>
+</table>
+<?php echo $edit_col; ?>
+
+<?php 
+  }
+}
+}  
+?>
+
+<?php 
+if ($order_artworks) {
+foreach($order_artworks->result() as $artwork) {
+  $edit_col = sprintf('<a href="/clientorderitems/form_item/%d/%d/%s/%d/%d" title="Client Order Artwork - Edit"><img src="/images/buttons/small_edit.gif" /></a>',$clients_start,$clientid,$orderid,$stocks_edit,$artwork->artworkid);
+  if ($artwork->artworkid == $artworks_edit) {
+?>
+<!-- update artwork -->
+<?php echo form_open('clientorderitems/update_artwork/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit); ?>
+<?php echo validation_errors(); ?>
+
+<table class="zebraTable">
+<tr class="rowEven"><th colspan="5">Update Artwork</th><tr>
+<tr class="rowOdd"><td><img src="/images/icons/icon_save.gif" /><input type="submit" value="Update Artwork" title="Update Artwork" /></td>
+<td>From: <?php echo form_dropdown('artworksource', $artworksource_list, $artwork->artworksource, $artworksource_options); ?></td>
+<td>Status: <?php echo form_dropdown('artworkstatus', $artworkstatus_list, $artwork->artworkstatus, $artworkstatus_options); ?></td>
+<td>File: <input type="file" name="filename" size="20" /><br>
+<a href="/artwork/<?php echo $artwork->filename; ?>" ><?php echo $artwork->filename; ?></a></td></tr> 
+<tr class="rowOdd"><td colspan="5">Comment: <input type="text" name="comment" value="<?php echo $artwork->comment; ?>" size="80" maxlength="100" /></td></tr> 
+</table>
+
+<?php echo form_close(); ?>
+
+<?php 
+  } else {
+?>
+<!-- read only artwork -->
+<table class="zebraTable">
+<tr class="rowEven"><th colspan="4">Artwork</th><tr>
+<tr class="rowOdd"><td><?php echo $artwork->artworkid; ?></td>
+<td>From: <?php echo $artwork->artworksource; ?></td>
+<td>Status: <?php echo $artwork->artworkstatus; ?></td>
+<td>Uploaded by: <?php echo $artwork->uploadby; ?></td>
+<td>File: <a href="/artwork/<?php echo $artwork->filename; ?>" ><?php echo $artwork->filename; ?></a></td></tr> 
+<tr class="rowOdd"><td colspan="4">Comment: <?php echo $artwork->comment; ?></td></tr> 
+</table>
+
+<?php echo $edit_col; ?>
+
+<?php 
+  }
+}
+}  
+?>
+
+
+<!-- add new item -->
+<table class="zebraTable">
+<tr class="rowEven"><th colspan="4">Add Item</th><tr>
+<?php echo form_open('clientorderitems/form_select_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit); ?>
+<?php echo validation_errors(); ?>
+<tr class="rowOdd"><td>Item</td><td><?php echo form_dropdown('itemcode', $items_list, $itemcode, $items_options); ?>&nbsp;(Select the item for this order)</td></tr>
+<?php echo form_close(); ?>
+
+
+<?php if(isset($itemcode) && $itemcode != '') {?>
+
+<?php echo form_open('clientorderitems/form_select_style/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/'.$itemcode); ?>
+<?php echo validation_errors(); ?>
+<tr class="rowEven"><td>Style</td><td>
+
+<?php echo form_dropdown('styleid', $styles_list, $styleid, $styles_options); ?>&nbsp;(Select the colour for this item)</td></tr>
+<?php echo form_close(); ?>
+
+<?php }?>
+
+<?php if(isset($styleid) && $styleid != '') {?>
+
+<?php echo form_open('clientorderitems/insert_item/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit.'/'.$itemcode.'/'.$styleid); ?>
+<?php echo validation_errors(); ?>
+
+<tr class="rowOdd"><td>Comments</td><td colspan="3">
+<input type="text" name="description" value="" size="120" maxlength="200"></td></tr>
+<tr class="rowEven"><th colspan="4">Add Front Design</th><tr>
+
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo form_dropdown('frontlogopos', $frontlogopos_list, $frontlogopos, $frontlogopos_options); ?>(Select the position for team name or logo)</td></tr>
+
+<tr class="rowEven"><td>Logo Team Name</td><td><input type="text" name="frontlogoname" value="" size="40" maxlength="50"></td></tr>
+
+<tr class="rowOdd"><td>Logo Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontlogocolor', $artworkcolour_list, $frontlogocolor, $artworkcolour_options); ?></td></tr>
+
+<tr class="rowEven"><td>Logo Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontlogotrimcolor', $artworkcolour_list, $frontlogotrimcolor, $artworkcolour_options); ?></td></tr>
+
+<tr class="rowOdd"><td>Number Position</td><td><?php echo form_dropdown('frontnumpos', $frontnumpos_list, $frontnumpos, $frontnumpos_options); ?>(Select the position for numbers)</td></tr>
+
+<tr class="rowEven"><td>Number Size</td><td>
+
+<?php foreach ($numsize_list as $key => $value) {?>
+<input type="radio" name="frontnumsize" title="<?php echo $value;?>" value="<?php echo $key;?>"><?php echo $value;?>&nbsp;&nbsp;&nbsp;&nbsp;
+<?php } ?>
+
+</td></tr>
+
+<tr class="rowOdd"><td>Number Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontnumcolor', $artworkcolour_list, $frontnumcolor, $artworkcolour_options); ?></td></tr>
+
+<tr class="rowEven"><td>Number Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('frontnumtrimcolor', $artworkcolour_list, $frontnumtrimcolor, $artworkcolour_options); ?></td></tr>
+
+
+
+<tr class="rowEven"><th colspan="4">Add Back Design</th><tr>
+
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo form_dropdown('rearlogopos', $rearlogopos_list, $rearlogopos, $rearlogopos_options); ?>(Individual name position: Center)</td></tr>
+
+<tr class="rowEven"><td>Logo Team Name</td><td><input type="text" name="rearlogoname" value="" size="40" maxlength="50"></td></tr>
+
+<tr class="rowOdd"><td>Logo Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearlogocolor', $artworkcolour_list, $rearlogocolor, $artworkcolour_options); ?></td></tr>
+
+<tr class="rowEven"><td>Logo Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearlogotrimcolor', $artworkcolour_list, $rearlogotrimcolor, $artworkcolour_options); ?></td></tr>
+
+<tr class="rowOdd"><td>Number Position</td><td><?php echo form_dropdown('rearnumpos', $rearnumpos_list, $rearnumpos, $rearnumpos_options); ?>(Select the position for numbers)</td></tr>
+
+<tr class="rowEven"><td>Number Size</td><td>
+
+<?php foreach ($numsize_list as $key => $value) {?>
+<input type="radio" name="rearnumsize" title="<?php echo $value;?>" value="<?php echo $key;?>"><?php echo $value;?>&nbsp;&nbsp;&nbsp;&nbsp;
+<?php } ?>
+
+</td></tr>
+
+<tr class="rowOdd"><td>Number Top Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearnumcolor', $artworkcolour_list, $rearnumcolor, $artworkcolour_options); ?></td></tr>
+
+<tr class="rowEven"><td>Number Bottom Color</td>
+<td><img src="/images/icons/icon_colour.gif" /><?php echo form_dropdown('rearnumtrimcolor', $artworkcolour_list, $rearnumtrimcolor, $artworkcolour_options); ?></td></tr>
+
+
+
+
+<tr class="rowEven"><th colspan="4">Add Shorts Design</th><tr>
+
+<tr class="rowOdd"><td>Logo Position</td><td><?php echo form_dropdown('shortlogopos', $shortlogopos_list, $shortlogopos, $shortlogopos_options); ?>(Select the position for team name or logo)</td></tr>
+
+<tr class="rowEven"><td>Number Position</td><td><?php echo form_dropdown('shortnumpos', $shortnumpos_list, $shortnumpos, $shortnumpos_options); ?>(Select the position for numbers)</td></tr>
+
+
+<tr class="rowOdd"><td colspan="2">
+
+<table style="width:100%;border=1px">
+<tr class="rowEven"><th>Size</th><th>Add Qty</th><th>Add Numbers</th></tr>
+<tr class="rowOdd"><td>XS</td><td><input type="text" name="xsmall" size="10" maxlength="10" /></td><td><input type="text" name="xsmallnumbers" size="100" maxlength="250" /></td></tr>
+<tr class="rowEven"><td>S</td><td><input type="text" name="small" size="10" maxlength="10" /></td><td><input type="text" name="smallnumbers" size="100" maxlength="250" /></td></tr>
+<tr class="rowOdd"><td>M</td><td><input type="text" name="medium" size="10" maxlength="10" /></td><td><input type="text" name="mediumnumbers" size="100" maxlength="250" /></td></tr>
+<tr class="rowEven"><td>L</td><td><input type="text" name="large" size="10" maxlength="10" /></td><td><input type="text" name="largenumbers" size="100" maxlength="250" /></td></tr>
+<tr class="rowOdd"><td>XL</td><td><input type="text" name="xlarge" size="10" maxlength="10" /></td><td><input type="text" name="xlargenumbers" size="100" maxlength="250" /></td></tr>
+<tr class="rowEven"><td>XXL</td><td><input type="text" name="xxlarge" size="10" maxlength="10" /></td><td><input type="text" name="xxlargenumbers" size="100" maxlength="250" /></td></tr>
+</table>
+
+</td></tr>
+
+<tr class="rowOdd"><td colspan="2"><img src="/images/icons/icon_save.gif" />&nbsp;<input type="submit" value="Add New Order Item" title="Add New Order Item" /></td></tr>
+<?php echo form_close(); ?>
+
+<?php }?>
+
+</table>
+
+<!-- add artwork -->
+<?php echo form_open('clientorderitems/insert_artwork/'.$clients_start.'/'.$clientid.'/'.$orderid.'/'.$stocks_edit.'/'.$artworks_edit); ?>
+<?php echo validation_errors(); ?>
+
+<table class="zebraTable">
+<tr class="rowEven"><th colspan="4">Add Artwork</th><tr>
+<tr class="rowOdd">
+<td>From</td><td><?php echo form_dropdown('artworksource', $artworksource_list, '', $artworksource_options); ?></td>
+<td>Status</td><td><?php echo form_dropdown('artworkstatus', $artworkstatus_list, '', $artworkstatus_options); ?></td></tr>
+<tr class="rowOdd">
+<td>File</td><td><input type="file" name="filename" size="20" /></td>
+<td>Comment</td><td><input type="text" name="comment" value="" size="80" maxlength="100" /></td></tr>
+<tr class="rowOdd">
+<td colspan="4"><img src="/images/icons/icon_save.gif" />&nbsp;<input type="submit" value="Add Artwork" title="Add Artwork" /></td></tr> 
+</table>
+
+<?php echo form_close(); ?>
+

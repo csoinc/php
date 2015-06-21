@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename source module &apos;tools/promotion.promition_price.php&apos; to &apos;promotion_price.php&apos;&#x0D;&#x0A;- Original element: &apos;tools/promotion\promition_price.php&apos;&#x0D;&#x0A;- Renamed element: &apos;tools/promotion\promotion_price.php&apos;" description="Rename source module &apos;promition_price.php&apos;" flags="589830" id="org.eclipse.dltk.ui.rename.sourcemodule" input="/&lt;tools\/promotion{promition_price.php" name="promotion_price.php" stamp="1337269737056" version="1.0"/>
+</session>

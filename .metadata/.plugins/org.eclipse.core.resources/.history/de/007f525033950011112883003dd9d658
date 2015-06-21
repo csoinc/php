@@ -1,0 +1,207 @@
+<?php
+class Accounts extends CI_Controller {
+
+  private $title;
+  private $trip;
+
+  public function __construct()
+  {
+    parent::__construct();
+    $this->load->library('template');
+    $this->load->library('session');
+    $this->load->library('form_validation');
+    $this->load->helper(array('form', 'url'));
+    $this->load->language('properties');
+    $this->load->model('users');
+    $this->load->model('codes');
+    $this->load->model('messages');
+
+    $this->title = "User Login";
+    $this->trip = '<img src="/images/icons/icon_arrow_right.gif" />&nbsp;User Login';
+
+  }
+
+  public function index()
+  {
+    if ($this->session->userdata('uf_logged_in')) {
+      $uf_orders = $this->session->userdata('uf_orders');
+      $uf_stocks = $this->session->userdata('uf_stocks');
+      $uf_uniforms = $this->session->userdata('uf_uniforms');
+
+      if (($this->codes->role_order_read($uf_orders)) || ($this->codes->role_order_update($uf_orders))) {
+        redirect('/uniformorders/', 'refresh');
+      }
+
+      if (($this->codes->role_stock_read($uf_stocks)) || ($this->codes->role_stock_update($uf_stocks))) {
+        redirect('/uniforms/', 'refresh');
+      }
+
+      if (($this->codes->role_uniform_read($uf_uniforms)) || ($this->codes->role_uniform_update($uf_uniforms))) {
+        redirect('/uniforms/', 'refresh');
+      }
+
+      redirect('/customerorders/', 'refresh');
+
+    } else {
+      redirect('/accounts/form_login/', 'refresh');
+    }
+  }
+
+
+  public function form_login($message = 'Please input your email address and password to login.')
+  {
+    $this->template->write_view('header', 'common/header');
+    $this->template->write('message', $message);
+    $this->template->write('title', $this->title);
+    $this->template->write('trip', $this->trip);
+    $this->template->write_view('content', 'login_form');
+    // Write to $content
+    $this->template->write_view('footer', 'common/footer');
+    // Render the template
+    $this->template->render();
+  }
+
+  public function login()
+  {
+    $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
+    $this->form_validation->set_rules('password', 'Password', 'trim|required');
+    //$this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[5]|max_length[12]|xss_clean');
+    //$this->form_validation->set_rules('password', 'Password', 'trim|required|matches[passconf]|md5');
+    //$this->form_validation->set_rules('passconf', 'Password Confirmation', 'trim|required');
+    //$this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
+    if ($this->form_validation->run() == TRUE)
+    {
+      $data['email'] = $this->input->get_post('email',TRUE);
+      $data['password'] = $this->input->get_post('password',TRUE);
+
+      if ($data['row'] = $this->users->select_user_by_id($data['email'], $data['password'])) {
+
+        //log_message('debug', $data['row']->username);
+        $sessiondata = array(
+              'uf_username'=> $data['row']->username,
+              'uf_email' => $data['row']->email,
+              'uf_orders' => $data['row']->orders,
+          	  'uf_stocks' => $data['row']->stocks,
+              'uf_uniforms' => $data['row']->uniforms,
+          	  'uf_logged_in' => TRUE
+        );
+
+        $this->session->set_userdata($sessiondata);
+        redirect('/accounts/', 'refresh');
+      } else {
+        //$this->template->write('message', ERROR_USER_LOGIN);
+        redirect('/accounts/form_login/Error_either_your_email_address_or_your_password_is_not_correct', 'refresh');
+      }
+    } else {
+      redirect('/accounts/form_login/Failed_on_validate_input_data', 'refresh');
+    }
+
+  }
+
+  public function logout()
+  {
+    $this->session->sess_destroy();
+    redirect('/accounts/index/Logout-successful.', 'refresh');
+  }
+
+  public function form_password($message = 'Please input your email address to retrieve your password.')
+  {
+    $this->template->write_view('header', 'common/header');
+    $this->template->write('message', $message);
+    $this->template->write('title', $this->title);
+    $this->template->write('trip', $this->trip);
+    $this->template->write_view('content', 'password_form');
+    // Write to $content
+    $this->template->write_view('footer', 'common/footer');
+    // Render the template
+    $this->template->render();
+  }
+
+  public function forgot_password()
+  {
+    $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
+    if ($this->form_validation->run() == TRUE)
+    {
+      $email = $this->input->get_post('email',TRUE);
+
+      if ($password = $this->users->select_password_by_email($email)) {
+        $subject = 'Message from http://uniforms.canuckstuff.com';
+        $message = 'Dear Customer,<br><br>Your login name is <b>'.$email.'</b>&nbsp;';
+        $message = $message.'and your password is <b>'.$password.'</b><br><br>';
+        $message = $message.'Thanks,<br><b>Canuck Stuff Uniforms</b><br>';
+        $message = $message.'Address: 2161 Midland Ave. Unit 2, Scarborough, ON, M1P 4T3<br>';
+        $message = $message.'Telephone: (416)299-1704 or 1-800-968-9306<br>';
+        $message = $message.'Fax: (416)609-9604 or 1-800-968-9456<br>';
+        $message = $message.'Email: info@canuckstuff.com<br>';
+
+        $this->messages->send($email, $subject, $message);
+        redirect('/accounts/form_login/Your_password_was_sent_to_your_email_address', 'refresh');
+      } else {
+        redirect('/accounts/form_password/Error_your_email_address_is_not_correct', 'refresh');
+      }
+    } else {
+      redirect('/accounts/form_password/Failed_on_validate_input_data', 'refresh');
+    }
+
+  }
+
+  public function form_admin_profile($message = 'Please input your new password and new username for update your profile.')
+  {
+    if ($this->session->userdata('uf_logged_in')) {
+
+      $this->template->write_view('header', 'common/header');
+      $this->template->write('message', $message);
+      $this->template->write('title', $this->title);
+      $this->template->write('trip', $this->trip);
+      $this->template->write_view('content', 'admin_profile_form');
+      // Write to $content
+      $this->template->write_view('footer', 'common/footer');
+      // Render the template
+      $this->template->render();
+    } else {
+      redirect('/accounts/form_login/', 'refresh');
+    }
+  }
+
+  public function admin_profile()
+  {
+    $this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[3]|max_length[50]|xss_clean');
+    $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[4]|max_length[15]|xss_clean');
+    $this->form_validation->set_rules('confirm_password', 'ConfirmPassword', 'trim|required|min_length[3]|max_length[50]|xss_clean');
+    
+    if ($this->form_validation->run() == TRUE)
+    {
+      $email = $this->input->get_post('email',TRUE);
+  
+      if ($password = $this->users->select_password_by_email($email)) {
+        $subject = 'Message from http://uniforms.canuckstuff.com';
+        $message = 'Dear Customer,<br><br>Your login name is <b>'.$email.'</b>&nbsp;';
+        $message = $message.'and your password is <b>'.$password.'</b><br><br>';
+        $message = $message.'Thanks,<br><b>Canuck Stuff Uniforms</b><br>';
+        $message = $message.'Address: 2161 Midland Ave. Unit 2, Scarborough, ON, M1P 4T3<br>';
+        $message = $message.'Telephone: (416)299-1704 or 1-800-968-9306<br>';
+        $message = $message.'Fax: (416)609-9604 or 1-800-968-9456<br>';
+        $message = $message.'Email: info@canuckstuff.com<br>';
+  
+        $this->messages->send($email, $subject, $message);
+        redirect('/accounts/form_login/Your_password_was_sent_to_your_email_address', 'refresh');
+      } else {
+        redirect('/accounts/form_password/Error_your_email_address_is_not_correct', 'refresh');
+      }
+    } else {
+      redirect('/accounts/form_password/Failed_on_validate_input_data', 'refresh');
+    }
+  
+  }
+  
+  
+  
+  
+  public function comments()
+  {
+    echo 'Account - account and authentication.';
+  }
+
+
+}
+?>

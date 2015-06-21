@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename source module &apos;seo/badminton.rona_store_export.php&apos; to &apos;sitemap_export.php&apos;&#x0D;&#x0A;- Original element: &apos;seo/badminton\rona_store_export.php&apos;&#x0D;&#x0A;- Renamed element: &apos;seo/badminton\sitemap_export.php&apos;" description="Rename source module &apos;rona_store_export.php&apos;" flags="589830" id="org.eclipse.dltk.ui.rename.sourcemodule" input="/&lt;seo\/badminton{rona_store_export.php" name="sitemap_export.php" stamp="1321026421883" version="1.0"/>
+</session>

@@ -1,0 +1,186 @@
+<?php
+
+class Styles extends CI_Model {
+
+  function __construct()
+  {
+    parent::__construct();
+    $this->load->database();
+    $this->load->library('session');
+  }
+
+  function select_styles_by_itemcode($itemcode)
+  {
+    $select_sql = "SELECT t.*, i.itemname FROM styles t LEFT JOIN items i ON t.itemcode = i.itemcode";
+    $select_sql = $select_sql." WHERE t.itemcode = '".$itemcode."'";
+    $select_sql = $select_sql." ORDER BY t.colorname";
+
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      return $query;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function select_code_styles($itemcode)
+  {
+    $select_sql = "SELECT styleid, colorname FROM styles";
+    $select_sql = $select_sql." WHERE itemcode = '".$itemcode."'";
+    $select_sql = $select_sql." ORDER BY colorname";
+      
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    $codes = array();
+    $codes[''] = 'Select style below:';
+  
+    foreach($query->result() as $row)
+    {
+      $codes[$row->styleid] = $row->colorname;
+    }
+    return ($codes);
+  
+  }
+  
+  function select_style_by_id($styleid)
+  {
+    $select_sql = "SELECT * FROM styles";
+    $select_sql = $select_sql." WHERE styleid = ".$styleid;
+    $select_sql = $select_sql." LIMIT 1";
+  
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      $row = $query->row();
+      return $row;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  /**
+   * 
+   * Enter description here ...
+   * @param unknown_type $itemcode
+   * @param unknown_type $colorid
+   * @param unknown_type $colorname
+   * @param unknown_type $frontimage
+   * @param unknown_type $rearimage
+   * @param unknown_type $sideimage
+   * @return boolean
+   */
+  function insert($itemcode, $colorname, $frontimage, $rearimage, $sideimage)
+  {
+    $styleid = $this->next_styleid();
+    if ($styleid) {
+      $insert_sql="INSERT INTO styles (styleid,itemcode,colorname,frontimage,rearimage,sideimage) VALUES ("
+      .$styleid.",'".$itemcode."','".$colorname."','"
+      .$frontimage."','".$rearimage."','".$sideimage."')";
+
+      //log_message('debug', $insert_sql);
+      $query = $this->db->query($insert_sql);
+      if ($this->db->affected_rows() > 0) {
+        return TRUE;
+      } else {
+        return FALSE;
+      }
+    } else {
+      return FALSE;
+    }
+  }
+
+  function next_styleid()
+  {
+    $select_sql="SELECT MAX(styleid)+1 AS next_id FROM styles";
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      $row = $query->row();
+      return $row->next_id;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function update($styleid, $colorname)
+  {
+    $update_sql="UPDATE styles SET colorname='".mysql_real_escape_string(ucwords(strtolower($colorname)))
+    ."' WHERE styleid = ".$styleid;
+
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function update_frontimage($styleid, $frontimage)
+  {
+    $update_sql="UPDATE styles SET frontimage='".mysql_real_escape_string($frontimage)
+    ."' WHERE styleid = ".$styleid;
+
+    log_message('debug', '##update item');
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function update_rearimage($styleid, $rearimage)
+  {
+    $update_sql="UPDATE styles SET rearimage='".mysql_real_escape_string($rearimage)
+    ."' WHERE styleid = ".$styleid;
+
+    log_message('debug', '##update item');
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function update_sideimage($styleid, $sideimage)
+  {
+    $update_sql="UPDATE styles SET sideimage='".mysql_real_escape_string($sideimage)
+    ."' WHERE styleid = ".$styleid;
+
+    log_message('debug', '##update item');
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function delete($styleid)
+  {
+    $delete_sql="DELETE FROM styles WHERE styleid = ".$styleid;
+    $query = $this->db->query($delete_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function status($styleid, $status)
+  {
+    $update_sql="UPDATE styles SET status=".mysql_real_escape_string($status)
+    ." WHERE styleid = ".$styleid;
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+}

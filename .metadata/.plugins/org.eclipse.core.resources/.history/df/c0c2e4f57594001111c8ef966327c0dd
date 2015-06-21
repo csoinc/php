@@ -1,0 +1,72 @@
+<div id="updateOrderStatus" class='noprint'>
+<?php echo sprintf('<a href="/uniformorders/select/%d" title="Back"><img src="/images/buttons/button_back.gif" /></a>', $orders_start); ?>&nbsp;&nbsp;<br>
+<?php echo form_open('uniformorderitems/update_status/'.$orders_start.'/'.$order->orderid); ?>
+<?php echo validation_errors(); ?>
+<b>Order Status:&nbsp;</b><?php echo $order->status; ?>&nbsp;(Rev <?php echo $order->revision; ?>)&nbsp;&nbsp;
+Created by <?php echo $order->createdby; ?>&nbsp;and&nbsp;Updated by&nbsp;<?php echo $order->updby; ?>&nbsp;at&nbsp;<?php echo $order->lastupddate; ?><br>
+
+<b>New Order Status: </b><?php echo form_dropdown('orderstatus', $orderstatus_list, $order->orderstatus, $orderstatus_options); ?>&nbsp;&nbsp;
+<b>Comments: </b><input type="text" name="updcomment" value="<?php echo set_value('updcomment', $order->updcomment); ?>" size="50" maxlength="100" />&nbsp;&nbsp; 
+<img src="/images/icons/icon_save.gif" /><input type="submit" value="Update Order Status" title="Update Order Status" />&nbsp;&nbsp;
+<a href="javascript:onClick=printPage()" title="Order - Print"><img src="/images/icons/icon_printer.gif" height="20px" /></a>
+<?php echo form_close(); ?>
+<br>
+</div>
+<b>Order #:&nbsp;</b><?php echo $order->orderid; ?>
+<table class="printTable">
+<tr class="rowOdd"><th colspan="4">Client Information</th><tr>
+<tr class="rowEven"><td>Name</td><td><?php echo $order->contact; ?></td><td>Client #</td><td><?php echo $order->clientid; ?></td></tr>
+<tr class="rowOdd"><td>Telephone</td><td><?php echo $order->telephone; ?></td><td>Cell Phone</td><td><?php echo $order->cellphone; ?></td></tr>
+<tr class="rowEven"><td>Email</td><td><?php echo $order->email; ?></td><td>Date In</td><td><?php echo $order->orderdate; ?></td></tr>
+<tr class="rowOdd"><td>School</td><td><?php echo $order->name; ?></td><td>Date Needed</td><td><?php echo $order->requireddate; ?></td></tr>
+<tr class="rowEven"><td>Payment</td><td><?php echo $order->payment; ?></td><td>Expire Date</td><td><?php echo $order->expdate; ?></td></tr>
+<tr class="rowOdd"><td>Address</td><td colspan="3"><?php echo $order->address; ?>&nbsp;<?php echo $order->zipcode; ?></td></tr>
+<tr class="rowEven"><td>Shipping Addr</td><td colspan="3"><?php echo $order->shippingaddr; ?>&nbsp;<?php echo $order->shippingzip; ?></td></tr>
+<tr class="rowOdd"><td>Comments</td><td colspan="3"><?php echo $order->comments; ?>&nbsp;<?php echo $order->updcomment; ?></td></tr>
+</table>
+
+
+
+<?php if (isset($order_items_table)) echo $order_items_table; ?>
+
+
+<table class="printTable">
+
+<tr><th colspan="2">Artworks</th></tr>
+
+<?php 
+if ($order_artworks) {
+foreach($order_artworks->result() as $artwork) {
+  $filename = $artwork->filename;
+  if ($filename != '') {
+    $index = strrpos($filename, '.');
+    $ext = substr($filename, $index+1);
+    if (strtolower($ext) == 'jpg' || strtolower($ext) == 'gif' || strtolower($ext) == 'png') {
+      $image = '<img src="/artworks/'.$filename.'" height="200px" />';
+    } else {
+      $image = '';
+    }
+  }
+?>
+<tr><td><?php echo $image; ?></td>
+<td><a href="/artworks/<?php echo $artwork->filename; ?>" ><?php echo $artwork->filename; ?></a><br>
+From: <?php echo $artwork->artworksource; ?> Status: <?php echo $artwork->artworkstatus; ?> Uploaded by: <?php echo $artwork->uploadby; ?> 
+Comment: <?php echo $artwork->comment; ?>
+</td></tr>
+<?php 
+}
+}  
+?>
+</table>
+
+<div id="addArtwork" class='noprint'>
+<?php echo form_open_multipart('uniformorderitems/insert_artwork/'.$orders_start.'/'.$order->orderid); ?>
+<?php echo validation_errors(); ?>
+File: <input type="file" name="filename" size="20" />&nbsp;
+From: <?php echo form_dropdown('artworksource', $artworksource_list, '', $artworksource_options); ?>&nbsp;
+Status: <?php echo form_dropdown('artworkstatus', $artworkstatus_list, '', $artworkstatus_options); ?>&nbsp;
+Comment: <input type="text" name="comment" value="" size="25" maxlength="100" />&nbsp;
+<img src="/images/icons/icon_save.gif" /><input type="submit" value="Add New Artwork" title="Add New Artwork" /><br>
+<?php echo form_close(); ?>
+
+</div>

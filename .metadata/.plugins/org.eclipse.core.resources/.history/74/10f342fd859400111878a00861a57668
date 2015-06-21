@@ -1,0 +1,46 @@
+<?php
+
+class Messages extends CI_Model {
+
+	function __construct()
+	{
+		// Call the Model constructor
+		parent::__construct();
+		$this->load->database();
+		$this->load->library('encrypt');
+		$this->load->library('session');
+	}
+
+	function send($email, $password)
+	{
+	  
+	  
+	  $this->load->library('email');
+	  
+	  $this->email->from('your@example.com', 'Your Name');
+	  $this->email->to('someone@example.com');
+	  $this->email->cc('another@another-example.com');
+	  $this->email->bcc('them@their-example.com');
+	  
+	  $this->email->subject('Email Test');
+	  $this->email->message('Testing the email class.');
+	  
+	  $this->email->send();
+	  
+	  echo $this->email->print_debugger();
+	  Setting Email Preferences
+	  
+	  There are 17 different preferences available to tailor how your email messages are sent. You can either set them manually as described here, or automatically via preferences stored in your config file, described below:
+	  
+	  Preferences are set by passing an array of preference values to the email initialize function. Here is an example of how you might set some preferences:
+	  $config['protocol'] = 'sendmail';
+	  $config['mailpath'] = '/usr/sbin/sendmail';
+	  $config['charset'] = 'iso-8859-1';
+	  $config['wordwrap'] = TRUE;
+	  
+	  $this->email->initialize($config);
+	  
+	}
+
+	
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;/canuckst/index_move.htm&apos; to &apos;index_facebook.htm&apos;&#x0D;&#x0A;- Original element: &apos;index_move.htm&apos;" description="Rename resource &apos;index_move.htm&apos;" flags="7" id="org.eclipse.dltk.ui.rename.resource" input="index_move.htm" name="index_facebook.htm" stamp="1386120580597" version="1.0"/>
+</session>

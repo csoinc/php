@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;canuckun&apos;" deleteContents="false" description="Delete resource &apos;canuckun&apos;" element1="/canuckun" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1363450133551"/>&#x0A;<refactoring comment="Rename Script project &apos;canuckba&apos; to &apos;canuckun&apos;&#x0D;&#x0A;- Original element: &apos;canuckba&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename Script project &apos;canuckba&apos;" flags="7" id="org.eclipse.dltk.ui.rename.script.project" input="=canuckba" name="canuckun" references="true" stamp="1363450379201" version="1.0"/>
+</session>

@@ -1,0 +1,301 @@
+<?php
+
+class Stocks extends CI_Model {
+
+  function __construct()
+  {
+    parent::__construct();
+    $this->load->database();
+    $this->load->library('session');
+  }
+
+  function select_styles_subtotal($itemcode)
+  {
+    $select_sql = "SELECT s.itemcode, i.itemname, t.styleid, t.colorname, SUM(xsmall) AS xs, SUM(small) AS s, SUM(medium) AS m,"
+    ." SUM(large) AS l, SUM(xlarge) AS xl, SUM(xxlarge) AS xxl, SUM(xsmall+small+medium+large+xlarge+xxlarge) AS subtotal"
+    ." FROM stocks s LEFT JOIN styles t ON s.styleid = t.styleid LEFT JOIN items i ON s.itemcode = i.itemcode";
+    $select_sql = $select_sql." WHERE t.itemcode = '".$itemcode."'";
+    $select_sql = $select_sql." GROUP BY s.itemcode, s.styleid ORDER BY t.colorname";    
+
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      return $query;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function select_items_total($itemcode)
+  {
+    $select_sql = "SELECT s.itemcode, i.itemname, t.colorname, SUM(xsmall) AS xs, SUM(small) AS s, SUM(medium) AS m,"
+    ." SUM(large) AS l, SUM(xlarge) AS xl, SUM(xxlarge) AS xxl, SUM(xsmall+small+medium+large+xlarge+xxlarge) AS total"
+    ." FROM stocks s LEFT JOIN styles t ON s.styleid = t.styleid LEFT JOIN items i ON s.itemcode = i.itemcode";
+    $select_sql = $select_sql." WHERE t.itemcode = '".$itemcode."'";
+    $select_sql = $select_sql." LIMIT 1";
+  
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      $row = $query->row();
+      return $row;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function select_styles_total($itemcode, $styleid)
+  {
+    $select_sql = "SELECT s.itemcode, i.itemname, t.colorname, SUM(xsmall) AS xs, SUM(small) AS s, SUM(medium) AS m,"
+    ." SUM(large) AS l, SUM(xlarge) AS xl, SUM(xxlarge) AS xxl, SUM(xsmall+small+medium+large+xlarge+xxlarge) AS total"
+    ." FROM stocks s LEFT JOIN styles t ON s.styleid = t.styleid LEFT JOIN items i ON s.itemcode = i.itemcode";
+    $select_sql = $select_sql." WHERE t.itemcode = '".$itemcode."' AND s.styleid = ".$styleid;
+    $select_sql = $select_sql." LIMIT 1";
+  
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      $row = $query->row();
+      return $row;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function select_stocks_by_style($styleid)
+  {
+    $select_sql = "SELECT s.stockid, s.itemcode, i.itemname, t.colorname, s.stockdate, s.code, xsmall AS xs, small AS s, medium AS m,"
+    ." large AS l, xlarge AS xl, xxlarge AS xxl, SUM(xsmall+small+medium+large+xlarge+xxlarge) AS subtotal, description, comments"
+    ." FROM stocks s LEFT JOIN styles t ON s.styleid = t.styleid LEFT JOIN items i ON s.itemcode = i.itemcode";
+    $select_sql = $select_sql." WHERE s.styleid = ".$styleid;
+    $select_sql = $select_sql." GROUP BY s.stockid ORDER BY s.stockid DESC";
+  
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      return $query;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function select_stocks_by_order($orderid)
+  {
+    $select_sql = "SELECT s.*,i.itemname,(s.xsmall+s.small+s.medium+s.large+s.xlarge+s.xxlarge) AS subtotal"
+    ." FROM stocks s LEFT JOIN styles t ON s.styleid = t.styleid LEFT JOIN items i ON s.itemcode = i.itemcode";
+    $select_sql = $select_sql." WHERE s.orderid = ".$orderid;
+    $select_sql = $select_sql." ORDER BY s.stockid DESC";
+  
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      return $query;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function select_stock_by_id($stockid)
+  {
+    $select_sql = "SELECT * FROM stocks";
+    $select_sql = $select_sql." WHERE stockid = ".$stockid;
+    $select_sql = $select_sql." LIMIT 1";
+  
+    //log_message('debug', $select_sql);
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      $row = $query->row();
+      return $row;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function insert_stock($itemcode, $styleid, $code, $xsmall, $small, $medium, $large, $xlarge, $xxlarge, $comments)
+  {
+    $stockid = $this->next_stockid();
+    if ($stockid) {
+      $insert_sql="INSERT INTO stocks (stockid,itemcode,styleid,code,xsmall,small,medium,large,xlarge,xxlarge,comments,orderid,stockdate) VALUES ("
+      .$stockid.",'".$itemcode."',".$styleid.",'".$code."',".$xsmall.",".$small.",".$medium.",".$large.",".$xlarge.",".$xxlarge.",'".$comments.
+      "',0,now())";
+
+      log_message('debug', $insert_sql);
+      $query = $this->db->query($insert_sql);
+      if ($this->db->affected_rows() > 0) {
+        return $stockid;
+      } else {
+        return FALSE;
+      }
+    } else {
+      return FALSE;
+    }
+  }
+
+  function next_stockid()
+  {
+    $select_sql="SELECT MAX(stockid)+1 AS next_id FROM stocks";
+    $query = $this->db->query($select_sql);
+    if ($query->num_rows() > 0)
+    {
+      $row = $query->row();
+      return $row->next_id;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function insert_order_item($itemcode, $styleid, $code, $orderid, $description)
+  {
+    $stockid = $this->next_stockid();
+    if ($stockid) {
+      $insert_sql="INSERT INTO stocks (stockid,itemcode,styleid,code,orderid,description,stockdate) VALUES ("
+      .$stockid.",'".$itemcode."',".$styleid.",'".$code."',".$orderid.",'".$description
+      ."',now())";
+      //log_message('debug', $insert_sql);
+      $query = $this->db->query($insert_sql);
+      if ($this->db->affected_rows() > 0) {
+        return $stockid;
+      } else {
+        return FALSE;
+      }
+    } else {
+      return FALSE;
+    }
+  }
+  
+  
+  function update_order_sizes($stockid, $orderid, $xsmall, $small, $medium, $large, $xlarge, $xxlarge, $comments)
+  {
+    $update_sql="UPDATE stocks SET xsmall=".$xsmall.",small=".$small.",medium=".$medium.",large=".$large
+    .",xlarge=".$xlarge.",xxlarge=".$xxlarge
+    .",comments='".mysql_real_escape_string($comments)
+    ."' WHERE stockid = ".$stockid;
+
+    log_message('debug', $update_sql);
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function update_order_numbers($stockid, $orderid, $xsmallnumbers, $smallnumbers, $mediumnumbers, $largenumbers, $xlargenumbers, $xxlargenumbers)
+  {
+    $update_sql="UPDATE stocks SET xsmallnumbers='".mysql_real_escape_string($xsmallnumbers)
+    ."',smallnumbers='".mysql_real_escape_string($smallnumbers)
+    ."',mediumnumbers='".mysql_real_escape_string($mediumnumbers)
+    ."',largenumbers='".mysql_real_escape_string($largenumbers)
+    ."',xlargenumbers=".mysql_real_escape_string($xlarge.",xxlarge=".mysql_real_escape_string($xxlarge
+    .",comments='".mysql_real_escape_string($comments)
+    ."' WHERE stockid = ".$stockid;
+  
+    log_message('debug', $update_sql);
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function update_order_front($stockid, $orderid, $frontnumpos, $frontnumsize, $frontnumcolor, $frontnumtrimcolor, $frontlogopos, $frontlogoname, $frontlogocolor, $frontlogotrimcolor)
+  {
+    $update_sql="UPDATE stocks SET frontnumpos=".$frontnumpos.",frontnumsize=".$frontnumsize.",frontnumcolor='".$frontnumcolor
+    ."',frontnumtrimcolor='".$frontnumtrimcolor."',frontlogopos=".$frontlogopos.",frontlogoname='".$frontlogoname
+    ."',frontlogocolor='".$frontlogocolor."',frontlogotrimcolor='".$frontlogotrimcolor
+    ."' WHERE stockid = ".$stockid;
+      
+    log_message('debug', $update_sql);
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function update_order_rear($stockid, $orderid, $rearnumpos, $rearnumsize, $rearnumcolor, $rearnumtrimcolor, $rearlogopos, $rearlogoname, $rearlogocolor, $rearlogotrimcolor)
+  {
+    $update_sql="UPDATE stocks SET rearnumpos=".$rearnumpos.",rearnumsize=".$rearnumsize.",rearnumcolor='".$rearnumcolor
+    ."',rearnumtrimcolor=".$rearnumtrimcolor."',rearlogopos=".$rearlogopos.",rearlogoname='".$rearlogoname
+    ."',rearlogocolor='".$rearlogocolor."',rearlogotrimcolor='".$rearlogotrimcolor
+    ."' WHERE stockid = ".$stockid;
+      
+    log_message('debug', $update_sql);
+        $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function update_order_side($stockid, $orderid, $sidenumpos, $sidenumsize, $sidenumcolor, $sidenumtrimcolor, $sidelogopos, $sidelogoname, $sidelogocolor, $sidelogotrimcolor)
+  {
+    $update_sql="UPDATE stocks SET sidenumpos=".$sidenumpos.",sidenumsize=".$sidenumsize.",sidenumcolor='".$sidenumcolor
+    ."',sidenumtrimcolor=".$sidenumtrimcolor."',sidelogopos=".$sidelogopos.",sidelogoname='".$sidelogoname
+    ."',sidelogocolor='".$sidelogocolor."',sidelogotrimcolor='".$sidelogotrimcolor
+    ."' WHERE stockid = ".$stockid;
+      
+    log_message('debug', $update_sql);
+        $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function update_order_short($stockid, $orderid, $sidenumpos, $sidelogopos)
+  {
+    $update_sql="UPDATE stocks SET sidenumpos=".$sidenumpos
+    .",sidelogopos=".$sidelogopos
+    ." WHERE stockid = ".$stockid;
+  
+    log_message('debug', $update_sql);
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  function update_order_item($stockid, $orderid, $itemcode, $styleid)
+  {
+    $update_sql="UPDATE stocks SET itemcode='".$itemcode
+    ."',styleid=".$styleid
+    ." WHERE stockid = ".$stockid;
+  
+    log_message('debug', $update_sql);
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+  
+  function update_order_style($stockid, $orderid, $styleid, $description)
+  {
+    $update_sql="UPDATE stocks SET description='".$description
+    ."',styleid=".$styleid
+    ." WHERE stockid = ".$stockid;
+  
+    log_message('debug', $update_sql);
+    $query = $this->db->query($update_sql);
+    if ($this->db->affected_rows() > 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+    
+}

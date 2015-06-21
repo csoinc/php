@@ -1,0 +1,20 @@
+<?php echo validation_errors(); ?>
+<?php echo form_open('accounts/forgot_password'); ?>
+
+
+
+
+<h5>Email Address</h5>
+<input type="text" name="email" value="<?php echo set_value('email'); ?>" size="50" maxlength="50" />
+
+
+<h5>Password</h5>
+<input type="password" name="password" value="<?php echo set_value('password'); ?>" size="50" maxlength="15" />
+
+<h5>Password</h5>
+<input type="password" name="password" value="<?php echo set_value('password'); ?>" size="50" maxlength="15" />
+
+<div>
+<input type="submit" value="Retrieve Password" />
+</div>
+

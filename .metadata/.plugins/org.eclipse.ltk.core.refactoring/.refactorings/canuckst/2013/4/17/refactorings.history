@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;/canuckst/store/images/13 we have moved flash.swf&apos; to &apos;ad_volleyball.swf&apos;&#x0D;&#x0A;- Original element: &apos;13 we have moved flash.swf&apos;" description="Rename resource &apos;13 we have moved flash.swf&apos;" flags="7" id="org.eclipse.dltk.ui.rename.resource" input="store/images/13 we have moved flash.swf" name="ad_volleyball.swf" stamp="1366502986787" version="1.0"/>
+</session>

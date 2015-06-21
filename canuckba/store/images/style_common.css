@@ -1,0 +1,936 @@
+﻿@charset "UTF-8";
+#main_cont {
+	margin: 0px 10px 10px 0px;
+	padding: 0px 0px 30px;
+}
+#main_cont .partition {
+	border-bottom: 1px solid #1A9431;
+	padding: 30px 30px 0px;
+	margin: 0px;
+}
+#main_cont .partition2 {
+	padding: 30px 30px 0px;
+	margin: 30px 0px 0px 0px;
+}
+#main_cont .partition2 .part_l {
+	float: left;
+	width: 300px;
+	padding: 0px;
+}
+
+#main_cont .partition2 .part_r {
+	float: right;
+	width: 430px;
+}
+
+
+#main_cont .partition3 {
+	padding: 0px 0px 0px;
+	margin: 0px 0px 40px 0px;
+}
+#main_cont .partition4 {
+	padding: 30px 30px 0px;
+	margin: 0px 0px 0px 0px;
+}
+#main_cont .partition5 {
+	border-bottom: 1px solid #1A9431;
+	padding: 0px 30px 0px;
+	margin: 0px;
+}
+#main_cont .title {
+	padding: 30px 0px 0px;
+}
+#main_cont .olympic {
+	margin: 2px 0px 20px;
+	padding: 2px 5px;
+	font-size: 35px;
+	line-height: 37px;
+	color: #000000;
+	font-weight: bold;
+	clear: both;
+	text-align: center;
+}
+#main_cont h3 {
+	margin: 2px 0px 10px;
+	padding: 2px 5px;
+	font-size: 20px;
+	line-height: 22px;
+	color: #000000;
+	border-bottom: 1px solid #0A50A1;
+	border-left: 5px solid #0A50A1;
+	font-weight: bold;
+	clear: both;
+}
+#main_cont h3 span {
+	font-size: 16px;
+	line-height: 11px;
+	margin: 0px;
+	padding: 0px;
+}
+#main_cont  h3 .blue { color: #669EFF; }
+#main_cont  h3 .red { color: #FF6E6E; }
+#main_cont h4 {
+	color: #999999;
+	font-size: 18px;
+	font-weight: bold;
+	line-height: 20px;
+	border-bottom: 1px solid #CCCCCC;
+	padding: 2px 0px 2px 10px;
+	margin: 0px 0px 10px;
+	clear: both;
+}
+
+#main_cont .question {
+	color: #999999;
+	font-size: 11px;
+	font-weight: bold;
+	line-height: 12px;
+	padding: 2px 0px 2px 0px;
+	margin: 0px 0px 2px;
+}
+
+#main_cont .answer {
+	color: #000000;
+	font-size: 11px;
+	font-weight: normal;
+	line-height: 11px;
+	padding: 2px 0px 2px 10px;
+	margin: 0px 0px 2px;
+}
+
+#main_cont .ad {
+	width: 800px;
+	margin: 0 auto;
+	padding: 10px 0;
+	text-align: center;
+}
+
+#main_cont ul h4 {
+	color: #999999;
+	font-size: 18px;
+	font-weight: bold;
+	line-height: 20px;
+	border-bottom: none;
+	padding: 0px 0px 0px 10px;
+	margin: 15px 0px 1px;
+	clear: both;
+}
+#main_cont h5 {
+	color: #000000;
+	font-size: 14px;
+	line-height: 16px;
+	text-align: justify;
+	clear: both;
+}
+#main_cont h6 {
+	font-size: 12px;
+	font-weight: bold;
+	color: #CCCCCC;
+	padding: 10px 0px 0px;
+	margin: 0px;
+}
+#main_cont p {
+	text-align: justify;
+	font-size: 11px;
+	color: #000000;
+	margin: 0px;
+	padding: 10px 0px;
+	line-height: 15px;
+}
+#contents #main_cont_bg .center {
+	text-align: center;
+}
+#main_cont .clear_l {
+	clear: left;
+}
+#main_cont .clear_r {
+	clear: right;
+}
+#main_cont .clear_b {
+	clear: both;
+}
+#main_cont .photo_l {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 20px 20px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l a{
+	color: #000000;	
+}
+#main_cont .photo_l a:link{
+	color: #000000;	
+}
+#main_cont .photo_l a:hover{
+	color: #000000;	
+}
+#main_cont .photo_l2 {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	margin: 0px 5px 5px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l3 {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 40px 20px 40px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l4 {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 5px 0px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l5 {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 30px 20px 30px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l6 {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 38px 20px 38px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l7 {
+	padding: 0px;
+	border: 0px;
+	display: block;
+	float: left;
+	margin: 0px 3px 5px 3px;
+}
+#main_cont .photo_l8 {
+	padding: 0px;
+	border: 0px;
+	display: block;
+	float: left;
+	margin: 0px 3px 40px 3px;
+}
+#main_cont .photo_l9 {
+	padding: 4px;
+	border: none;
+	display: block;
+	float: left;
+	margin: 0px 20px 20px 0px;
+}
+#main_cont .photo_l10 {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 20px 0px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l11 {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 20px 0px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .clothing {
+		float: left;
+	}
+#main_cont .photo_r {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: right;
+	margin: 0px 0px 20px 20px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_c {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	margin: 0px auto;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+#main_cont .photo_l_nf {
+	float: left;
+	margin: 0px 20px 20px 0px;
+}
+#main_cont .photo_r_nf {
+	float: right;
+	margin: 0px 0px 20px 20px;
+}
+#main_cont .photo_c_nf {
+	margin: 0px auto;
+}
+#main_cont .photo_p {
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+}
+
+#main_cont .photo_cap_l {
+	padding: 4px 4px 2px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 20px 20px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+	line-height: 15px;
+}
+#main_cont .photo_cap_l2 {
+	padding: 4px 4px 2px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 25px 20px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+	line-height: 15px;
+}
+#main_cont .photo_cap_l3 {
+	padding: 4px 4px 4px 100px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 20px 20px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+	line-height: 15px;
+}
+#main_cont .photo_cap_l4 {
+	padding: 5px 5px 2px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: left;
+	margin: 0px 25px 20px 0px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+	line-height: 15px;
+}
+#main_cont .center {
+	text-align: center;
+}
+#main_cont .right {
+	text-align: right;
+}
+#main_cont .photo_cap_r {
+	padding: 4px 4px 2px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	float: right;
+	margin: 0px 0px 20px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+	line-height: 20px;
+}
+#main_cont .photo_cap_c {
+	padding: 4px 4px 2px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	margin: 0px auto 20px;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+	line-height: 20px;
+}
+#main_cont .photo_cap_p {
+	padding: 4px 4px 2px;
+	border: 1px solid #CCCCCC;
+	display: block;
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	color: #333333;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 10px;
+	line-height: 20px;
+}
+
+#main_cont .partition .part_l {
+	float: left;
+	width: 300px;
+	padding: 0px;
+}
+#main_cont .partition .part_l2 {
+	float: left;
+	width: 100px;
+	padding: 0px;
+}
+#main_cont .partition .part_l3 {
+	float: left;
+	width: 400px;
+	padding: 0px;
+}
+
+/*1117*/
+#main_cont .partition01 {
+	border-bottom: 1px solid #1A9431;
+	padding: 20px 30px 0px 30px;
+	margin: 0px;
+}
+#main_cont .partition01 .part_l {
+	float: left;
+	width: 300px;
+	padding: 0px;
+}
+#main_cont .partition01 .part_l2 {
+	float: left;
+	width: 100px;
+	padding: 0px;
+}
+#main_cont .partition01 .part_l3 {
+	float: left;
+	width: 400px;
+	padding: 0px;
+}
+#main_cont .partition01 .part_r {
+	float: right;
+	width: 430px;
+}
+#main_cont .partition01 .part_r2 {
+	float: right;
+	width: 230px;
+}
+#main_cont .partition01 .part_r3 {
+	float: right;
+	width: 280px;
+}
+#main_cont .partition01 .part_r4 {
+	float: right;
+	width: 300px;
+}
+/**/
+
+
+#main_cont .partition .part_l3 .moreinfo {
+	text-align: right;
+	font-size: 24px;
+}
+#main_cont .part_3line {
+	float: left;
+	display: inline;
+	width: 240px;
+	margin: 0 10px 0 0;
+	padding: 0px;
+}
+#main_cont .part_3line p {
+	font-weight: normal;
+	width: 240px;
+	margin: 0 0 10px;
+}
+#main_cont .part_3line .spec_table dd {
+	padding: 2px 0px 2px 10px;
+}
+#main_cont .part_3line .performance {
+	clear: both;
+	margin: 0 0 0 5px;
+}
+#main_cont .part_3line .performance li {
+	width: 230px;
+}
+#main_cont .part_4line {
+	float: left;
+	display: inline;
+	width: 240px;
+	margin: 20px 100px 0 50px;
+	padding: 0px;
+}
+#main_cont .part_5line {
+	float: left;
+	display: inline;
+	width: 240px;
+	margin:20px 50px 0 0;
+	padding: 0px;
+}
+#main_cont .lineEnd {
+	margin: 0;
+}
+#main_cont .m125lm10r {
+	margin: 0 10px 0 125px;
+}
+
+/* For production Description*/
+
+#productDescription .part_r {
+	float: right;
+	width: 430px;
+}
+
+#productDescription .part_r2 {
+	float: right;
+	width: 230px;
+}
+#productDescription .part_r3 {
+	float: right;
+	width: 280px;
+}
+#productDescription .part_r4 {
+	float: right;
+	width: 300px;
+}
+#productDescription .part_f {
+	clear: both;
+	padding: 0px 0px 10px;
+	margin: 0px;
+}
+#productDescription .part_f {
+	clear: both;
+	padding: 0px 0px 10px;
+	margin: 0px;
+}
+#productDescription .aus {
+	padding: 0px 0px 10px;
+	margin: 0px;
+}
+#productDescription .aus ul {
+	padding: 0;
+	margin-bottom: 20px;
+}
+#productDescription .aus li {
+	width: 210px;
+	margin:0 5px 0 25px;
+	padding: 0;
+	float: left;
+}
+
+
+#productDescription .spec_table .st_head_size2 {
+	background: url(../images/spec_title/head_size.png) no-repeat left top;
+}
+#productDescription .spec_table .st_head_size {
+	background: url(../images/spec_title/head_size.png) no-repeat left top;
+}
+#productDescription .spec_table .st_length {
+	background: url(../images/spec_title/length.png) no-repeat left top;
+}
+#productDescription .spec_table .st_width {
+	background: url(../images/spec_title/width.png) no-repeat left top;
+}
+#productDescription .spec_table .st_thickness {
+	background: url(../images/spec_title/thickness.png) no-repeat left top;
+}
+#productDescription .spec_table .st_average_weight {
+	background: url(../images/spec_title/average_weight.png) no-repeat left top;
+}
+#productDescription .spec_table .st_grip_size {
+	background: url(../images/spec_title/grip_size.png) no-repeat left top;
+}
+#productDescription .spec_table .st_recommended_string {
+	background: url(../images/spec_title/recommended_string.png) no-repeat left top;
+}
+#productDescription .spec_table .st_advisory_staff {
+	background: url(../images/spec_title/advisory_staff.png) no-repeat left top;
+}
+#productDescription .spec_table .st_court_type {
+	background: url(../images/spec_title/court_type.png) no-repeat left top;
+}
+#productDescription .spec_table .st_upper {
+	background: url(../images/spec_title/upper.png) no-repeat left top;
+}
+#productDescription .spec_table .st_outsole {
+	background: url(../images/spec_title/outsole.png) no-repeat left top;
+}
+#productDescription .spec_table .st_midsole {
+	background: url(../images/spec_title/midsole.png) no-repeat left top;
+}
+#productDescription .spec_table .st_colour {
+	background: url(../images/spec_title/colour.png) no-repeat left top;
+}
+#productDescription .spec_table .st_product_number {
+	background: url(../images/spec_title/product_number.png) no-repeat left top;
+}
+#productDescription .spec_table .st_material_body_part {
+	background: url(../images/spec_title/material_body_part.png) no-repeat left top;
+}
+#productDescription .spec_table .st_material_insertion {
+	background: url(../images/spec_title/material_insertion.png) no-repeat left top;
+}
+#productDescription .spec_table .st_material {
+	background: url(../images/spec_title/material.png) no-repeat left top;
+}
+#productDescription .spec_table .st_size {
+	background: url(../images/spec_title/size.png) no-repeat left top;
+}
+#productDescription .spec_table .st_main {
+	background: url(../images/spec_title/main.png) no-repeat left top;
+}
+#productDescription .spec_table .st_crosses {
+	background: url(../images/spec_title/crosses.png) no-repeat left top;
+}
+#productDescription .spec_table .st_cross {
+	background: url(../images/spec_title/cross.png) no-repeat left top;
+}
+#productDescription .spec_table .st_weight {
+	background: url(../images/spec_title/weight.png) no-repeat left top;
+}
+#productDescription .spec_table .st_flex {
+	background: url(../images/spec_title/flex.png) no-repeat left top;
+}
+#productDescription .spec_table .st_composition_frame {
+	background: url(../images/spec_title/composition_frame.png) no-repeat left top;
+}
+#productDescription .spec_table .st_composition_shaft {
+	background: url(../images/spec_title/composition_shaft.png) no-repeat left top;
+}
+#productDescription .spec_table .st_weight_grip_size {
+	background: url(../images/spec_title/weight_grip_size.png) no-repeat left top;
+}
+#productDescription .spec_table .st_gauge {
+	background: url(../images/spec_title/gauge.png) no-repeat left top;
+}
+#productDescription .spec_table .st_tungsten_balanced {
+	background: url(../images/spec_title/tungsten_balanced.png) no-repeat left top;
+}
+#productDescription .spec_table .st_shaft_composition {
+	background: url(../images/spec_title/shaft_composition.png) no-repeat left top;
+}
+#productDescription .spec_table .st_swingweights {
+	background: url(../images/spec_title/swingweights.png) no-repeat left top;
+}
+#productDescription .spec_table .st_club_specs {
+	background: url(../images/spec_title/club_specs.png) no-repeat left top;
+}
+#productDescription .spec_table .st_head_construction {
+	background: url(../images/spec_title/head_construction.png) no-repeat left top;
+}
+#productDescription .spec_table .st_balance_weight {
+	background: url(../images/spec_title/balance_weight.png) no-repeat left top;
+}
+#productDescription .spec_table .st_shaft_flex {
+	background: url(../images/spec_title/shaft_flex.png) no-repeat left top;
+}
+#productDescription .spec_table .st_capacity {
+background: url(../images/spec_title/capacity.png) no-repeat left top;
+}
+
+
+#main_cont .product_photo {
+	margin: 0px;
+	padding: 0px;
+}
+#main_cont .product_photo2 {
+	margin: 0px;
+	padding: 0px;
+	text-align:center;
+}
+#main_cont .product_photo img {
+}
+#main_cont .product_photo_nf {
+	margin: 0px;
+	padding: 0px;
+}
+#main_cont .product_photo_nf img {
+}
+#main_cont .partition .part_r p {
+}
+#main_cont .spec_title {
+	font-size: 12px;
+	color: #CCCCCC;
+	padding: 5px 0px 2px;
+	margin: 0px 0px 5px;
+}
+
+
+#productDescription .spec_table {
+	font-size: 12px;
+	width: 100%;
+	line-height: 18px;
+	color: #000000;
+	margin: 0px;
+	padding: 0px 0px 10px;
+}
+#productDescription .spec_table dt {
+	font-weight: normal;
+	padding: 0px;
+	color: #000000;
+	height: 20px;
+	display: block;
+	font-size: 1px;
+	line-height: 1px;
+	text-indent: -90000px;
+}
+#productDescription .spec_table dd {
+	font-weight: normal;
+	padding: 2px 0px 2px 25px;
+}
+#productDescription .spec_table .cs_sel {
+	display: block;
+	clear: both;
+}
+#productDescription .spec_table .cs_sel span {
+	display: block;
+	float: left;
+	padding: 2px 0px;
+}
+#productDescription .spec_table .cs_sel .cs_sel_name {
+	text-align: left;
+	width: 80px;
+}
+#productDescription .spec_table .cs_sel .cs_sel_num {
+	width: 70px;
+	text-align: center;
+}
+
+#productDescription .performance {
+	margin: 0px auto;
+	padding: 0px;
+	list-style: none;
+}
+#productDescription .performance li {
+	float: left;
+	width: 230px;
+	text-align: center;
+	padding: 0px;
+	border-style: none;
+	margin: 0px auto;
+}
+#productDescription .performance a {
+	padding: 0px; margin: 0px auto; height: 26px; width: 220px;
+	display: block;
+	font-size: 1px; line-height: 1px;
+	color: #000000;
+}
+#productDescription.performance a:link {
+
+}
+
+#productDescription .performance a:hover {	
+
+}
+
+
+
+#main_cont .sitemap { border-bottom: 1px solid #CCCCCC; padding: 30px 30px 0px; margin: 0px; }
+#main_cont .sitemap h4 {
+	font-size: 14px;
+	padding: 5px 10px 2px;
+}
+#main_cont .sitemap h4 span {
+	font-weight: normal;
+	font-size: 12px;
+}
+#main_cont .sitemap h5 {
+	font-size: 14px;
+	padding: 3px 10px 2px;
+	border-bottom: 1px dotted #CCCCCC;
+}
+#main_cont .sitemap h5 span {
+	font-weight: normal;
+	font-size: 12px;
+}
+
+#main_cont .partition ul {
+	
+}
+#main_cont .partition li {
+	
+}
+#main_cont .partition p {
+	padding: 5px 0px;
+}
+#main_cont  .made {
+	font-size: 13px;
+	line-height: 17px;
+	text-align: right;
+	color: #777777;
+	padding: 5px 0px 0px;
+	clear: both;
+	font-weight: bold;
+	font-style: italic;
+}
+#main_cont .advisory_staff {
+	clear: both; padding: 30px 30px 0px;
+	font-size: 12px; line-height: 15px; color: #666666;
+}
+#main_cont .advisory_staff2 {
+	clear: both; padding: 0px 30px 0px;
+	font-size: 15px; line-height: 15px; color: #000000;
+}
+
+#main_cont .advisory_staff3 {
+	clear: both; padding: 30px 30px 0px;
+    margin-bottom:20px;
+	font-size: 12px; line-height: 15px; color: #666666;
+    border-bottom: 1px solid #1A9431;
+}
+
+#main_cont .as_l { width: 365px; float: left; }
+#main_cont .as_l2 { width: 740px; float: left; }
+#main_cont .as_r { width: 365px; float: right; }
+#main_cont #as_photo {
+	border-bottom: 1px solid #CCCCCC;
+}
+#main_cont #as_cont {
+	padding: 10px 50px 0px;
+	margin: 0px;
+	font-size: 12px;
+	line-height: 16px;
+	color: #CCCCCC;
+}
+#main_cont #as_cont dl { padding: 10px; margin: 0px; }
+#main_cont #as_cont dt {
+	padding: 2px;
+	border-bottom: 1px solid #CCCCCC; border-left: 5px solid #CCCCCC;
+	font-weight: bold; font-size: 16px; line-height: 20px;
+}
+#main_cont #as_cont dd { padding: 5px 0px 5px 30px; }
+#main_cont #as_cont ul { list-style: none; padding: 0px 10px 10px 40px; }
+#main_cont #as_cont li { border-bottom: 1px dotted #CCCCCC; padding: 5px 0px 2px; }
+#main_cont #as_cont2 {
+	padding: 10px 5px 0px;
+	margin: 0px;
+	font-size: 12px;
+	line-height: 16px;
+	color: #CCCCCC;
+}
+#main_cont .advisory_staff .as_country { font-size: 10px; font-weight: normal; line-height: 14px; }
+#main_cont .advisory_staff img {
+	background: #EEEEEE url(../images/photo_bg.png) repeat-x center bottom;
+	display: block; float: left; padding: 4px; margin: 0px 10px 0px 0px; border: 1px solid #CCCCCC;
+}
+#main_cont .advisory_staff .more { clear: both; padding: 0px; margin: 0px; }
+#main_cont .advisory_staff .more p { margin: 0px; padding: 0px; text-align: right; }
+#main_cont .advisory_staff ul { list-style: none; }
+#main_cont .advisory_staff li { padding: 0px 0px 5px; }
+#main_cont .advisory_staff h4 { padding: 0px; }
+#main_cont .topx_index { font-size: 14px; color: #999999; line-height: 18px; padding: 30px 0px; margin: 0px; }
+#main_cont .topx_index ul { list-style: none; }
+#main_cont .topx_index li {
+	border-bottom: 1px dotted #CCCCCC;
+	padding: 10px 30px 5px; margin: 0px;
+}
+#main_cont .pink {
+	color: #FF3399;
+	}
+#contents #main_cont_bg #main_cont .topx_index .date {
+	font-size: 10px;
+}
+#main_cont .topx_index strong {
+	height: 15px; width: 65px; padding: 0px; margin: 0px 10px 0px 0px; display: block;
+	float: left; font-size: 1px; line-height: 1px; color: #000000; text-indent: -100000px;
+}
+#main_cont .topx_index .tennis strong { background: url(../images/topix/icon/tennis.png) no-repeat left center; }
+#main_cont .topx_index .badminton strong { background: url(../images/badminton/icon/tennis.png) no-repeat left center; }
+#main_cont .topx_index .golf strong { background: url(../images/topix/icon/golf.png) no-repeat left center; }
+
+#main_cont .advisory_staff ul .none { border-bottom: 1px dotted #CCCCCC; display: block; padding-left:120px; }
+
+#main_cont .advisory_staff ul a { border-bottom: 1px dotted #CCCCCC; display: block; padding-left:120px;}
+#main_cont .advisory_staff ul a:link { border-bottom: 1px dotted #CCCCCC; }
+#main_cont .advisory_staff ul a:hover { border-bottom: 1px dotted #666666; }
+
+#main_cont .advisory a { color: #B2D4E5; }
+#main_cont .advisory a:link { color: #B2D4E5; }
+#main_cont .advisory a:hover { color: #FF0000; }
+#main_cont .advisory_staff ul span { border-bottom: 1px dotted #666666; display: block; }
+#main_cont .advisory_staff ul .list { border-bottom: 1px dotted #999999; display: block; padding: 0px 0px 2px; }
+#main_cont .advisory_staff ul .list2 { display: block; padding: 0px 0px 2px; }
+
+
+#main_cont .advisory_staff .blank { color: #999999; }
+
+#main_cont .advisory img {
+	border-width: 1px;
+	border-style: solid;
+	margin: 5px 5px 0px 0px;
+	padding: 0px;
+	
+}
+
+#main_cont .topx_cont {
+	padding: 30px 20px;
+	margin: 0px;
+}
+#main_cont .partition .size_chart {
+	padding: 0px 0px 20px;
+}
+#main_cont .font12{
+	font-size: 12px;
+	margin: 0px;
+}
+#main_cont .font14{
+	font-size: 14px;
+	margin: 0px;
+}
+#main_cont .font14b{
+	font-size: 14px;
+	margin: 0px;
+	font-weight: bold;
+}
+#main_cont .font13{
+	font-size: 13px;
+	text-align: center;
+	padding: 10px 20px;
+	margin: 0px;
+}
+
+#main_cont .font15{
+	font-size: 15px;
+	text-align: center;
+	padding: 10px 20px;
+	margin: 0px;
+}
+
+#main_cont .font17{
+	font-size: 17px;
+	line-height: 20px;
+	padding: 10px 20px;
+	margin: 0px;
+	font-weight: bold;
+	font-style: italic;
+	text-align: center;
+}
+#main_cont .font9_b{
+	font-size: 9px;
+	color: #000000;
+	font-weight: bold;
+}
+
+#main_cont .font22{
+	font-size: 22px;
+	line-height: 25px;
+	padding: 30px 20px;
+	margin: 0px;
+	font-weight: bold;
+	text-align: center;
+}
+#main_cont .partition .size_chart .unisex { background: #000066; }
+#main_cont .partition .size_chart .ladies { background: #660000; }
+
+.partition .sox_size_chart {
+	padding: 0px 0px 20px;
+}
+#main_cont .partition .sox_size_chart .sox { background: #006600; }
+#main_cont .partition .video {
+	text-align: center;
+}
+
+
+.clear_float{clear:both;}

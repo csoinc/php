@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;/overkill/images/overkill_splash.jpg&apos; to &apos;overkill_splash_3.jpg&apos;&#x0D;&#x0A;- Original element: &apos;overkill_splash.jpg&apos;" description="Rename resource &apos;overkill_splash.jpg&apos;" flags="7" id="org.eclipse.dltk.ui.rename.resource" input="images/overkill_splash.jpg" name="overkill_splash_3.jpg" stamp="1401930504767" version="1.0"/>
+</session>
